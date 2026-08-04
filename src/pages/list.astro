@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../components/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const tasks = await getCollection('tasks');
+
+const sortedTasks = [...tasks].sort((a, b) => new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime());
+---
+
+<BaseLayout title="Orbit — Task List View">
+  <div class="list-header">
+    <div>
+      <h1>📝 Task List View</h1>
+      <p class="subtitle">Complete catalog of tasks across all workspace projects.</p>
+    </div>
+
+    <a href="/new" class="btn-sketch btn-sketch-yellow">
+      + New Task
+    </a>
+  </div>
+
+  <div class="wobbly-box list-table-container">
+    <table class="sketch-table">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Title</th>
+          <th>Project</th>
+          <th>Priority</th>
+          <th>Assignee</th>
+          <th>Due Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedTasks.map((t) => (
+          <tr>
+            <td>
+              <span class={`badge-sketch badge-${t.data.status}`}>{t.data.status}</span>
+            </td>
+            <td>
+              <a href={`/tasks/${t.slug || t.id}`} class="table-task-link">
+                <strong>{t.data.title}</strong>
+              </a>
+              {t.data.parent && <span class="table-subtask"> ↳ subtask</span>}
+            </td>
+            <td>
+              <span class="project-pill">{t.data.project}</span>
+            </td>
+            <td>
+              <span class={`badge-sketch badge-${t.data.priority}`}>{t.data.priority}</span>
+            </td>
+            <td>
+              <span>{t.data.assignee.toLowerCase() === 'claude' || t.data.assignee.toLowerCase() === 'copilot' ? '🤖' : '🧑'} {t.data.assignee}</span>
+            </td>
+            <td>
+              <span class="date-text">{t.data.due || 'No due date'}</span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</BaseLayout>
+
+<style>
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0 1.5rem 0;
+  }
+  .subtitle {
+    font-size: 1.15rem;
+    color: var(--muted-text);
+  }
+  .list-table-container {
+    overflow-x: auto;
+    padding: 1rem;
+  }
+  .sketch-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.05rem;
+  }
+  .sketch-table th, .sketch-table td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--muted);
+  }
+  .sketch-table th {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    border-bottom: 2.5px solid var(--border);
+  }
+  .table-task-link {
+    color: var(--fg);
+    text-decoration: none !important;
+  }
+  .table-task-link:hover {
+    color: var(--accent-blue);
+  }
+  .table-subtask {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+  }
+  .project-pill {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.15rem 0.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--accent-yellow);
+  }
+  .date-text {
+    font-size: 0.95rem;
+    color: var(--muted-text);
+  }
+</style>

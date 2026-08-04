@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&display=swap');
+
+:root {
+  --bg: #fdfbf7;
+  --fg: #2d2d2d;
+  --muted: #e5e0d8;
+  --muted-text: #666056;
+  --accent: #ff4d4d;
+  --accent-blue: #2d5da1;
+  --accent-yellow: #fff9c4;
+  --accent-green: #4caf50;
+  --accent-purple: #9c27b0;
+  --border: #2d2d2d;
+  --border-width: 2.5px;
+
+  --font-heading: 'Kalam', cursive, sans-serif;
+  --font-body: 'Patrick Hand', cursive, sans-serif;
+
+  --wobbly-1: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --wobbly-2: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  --wobbly-3: 185px 10px 185px 10px / 10px 185px 10px 185px;
+
+  --shadow-sm: 2px 2px 0px 0px var(--border);
+  --shadow-md: 4px 4px 0px 0px var(--border);
+  --shadow-lg: 7px 7px 0px 0px var(--border);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--muted) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.4rem; }
+h2 { font-size: 1.9rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}
+
+/* Common container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}

@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../components/BaseLayout.astro';
+import QuickCreate from '../components/QuickCreate';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const projectList = projects.map((p) => ({
+  slug: p.slug || p.id,
+  title: p.data.title,
+}));
+---
+
+<BaseLayout title="Orbit — Quick Create">
+  <QuickCreate client:load projects={projectList} />
+</BaseLayout>

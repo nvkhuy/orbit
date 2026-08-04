@@ -1,0 +1,28 @@
+{
+  "name": "orbit",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Serverless, markdown-powered project management app for humans and AI agents",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "cli": "node cli/index.js"
+  },
+  "bin": {
+    "orbit": "./cli/index.js"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.1.0",
+    "@astrojs/preact": "^4.0.2",
+    "astro": "^5.2.5",
+    "commander": "^13.1.0",
+    "gray-matter": "^4.0.3",
+    "preact": "^10.25.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10"
+  }
+}

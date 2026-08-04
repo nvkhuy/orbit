@@ -1,276 +1,38 @@
 ---
 import BaseLayout from '../../components/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import TaskEditor from '../../components/TaskEditor';
+import { getCollection, getEntry } from 'astro:content';
 
-export async function getStaticPaths() {
-  const tasks = await getCollection('tasks');
-  return tasks.map((t) => ({
-    params: { slug: t.slug || t.id },
-    props: { task: t },
-  }));
-}
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/board');
 
-const { task } = Astro.props;
-const { Content } = await task.render();
+const taskEntry = await getEntry('tasks', slug);
+if (!taskEntry) return Astro.redirect('/board');
 
-const taskSlug = task.slug || task.id;
+const rawProjects = await getCollection('projects');
+const projects = rawProjects.map(p => ({
+  slug: p.id.replace(/\.md$/, ''),
+  title: p.data.title,
+  columns: p.data.columns,
+  color: p.data.color,
+}));
 
-const allTasks = await getCollection('tasks');
-const subtasks = allTasks.filter((t) => t.data.parent === taskSlug);
-
-const parentTask = task.data.parent
-  ? allTasks.find((t) => (t.slug || t.id) === task.data.parent)
-  : null;
+const initialTask = {
+  id: taskEntry.id,
+  slug: taskEntry.id.replace(/\.md$/, ''),
+  title: taskEntry.data.title,
+  project: taskEntry.data.project,
+  status: taskEntry.data.status,
+  priority: taskEntry.data.priority,
+  assignee: taskEntry.data.assignee,
+  tags: taskEntry.data.tags,
+  due: taskEntry.data.due ? String(taskEntry.data.due) : undefined,
+  order: taskEntry.data.order,
+  parent: taskEntry.data.parent,
+  body: taskEntry.body || '',
+};
 ---
 
-<BaseLayout title={`Orbit — Task: ${task.data.title}`}>
-  <div class="task-detail-header">
-    <div class="breadcrumb">
-      <a href="/list">← Back to Tasks</a>
-      {parentTask && (
-        <span> / Subtask of <a href={`/tasks/${parentTask.slug || parentTask.id}`}>{parentTask.data.title}</a></span>
-      )}
-    </div>
-
-    <div class="header-main">
-      <h1>📌 {task.data.title}</h1>
-      <div class="task-header-badges">
-        <span id="status-badge" class={`badge-sketch badge-${task.data.status}`}>{task.data.status}</span>
-        <span class={`badge-sketch badge-${task.data.priority}`}>{task.data.priority} priority</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="task-detail-grid">
-    <!-- Main Task Body -->
-    <div class="wobbly-box task-main-box">
-      <div class="task-body-header">
-        <h3>Description & Notes</h3>
-        <span class="file-path-info">Source: <code>src/content/tasks/{taskSlug}.md</code></span>
-      </div>
-      <hr class="hr-sketch" />
-
-      <div class="markdown-body">
-        <Content />
-      </div>
-
-      {subtasks.length > 0 && (
-        <>
-          <hr class="hr-sketch" />
-          <div class="subtasks-section">
-            <h3>↳ Subtasks ({subtasks.length})</h3>
-            <ul class="subtask-list">
-              {subtasks.map((st) => (
-                <li class="subtask-item">
-                  <a href={`/tasks/${st.slug || st.id}`}>{st.data.title}</a>
-                  <span class={`badge-sketch badge-${st.data.status}`}>{st.data.status}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
-    </div>
-
-    <!-- Metadata Sidebar -->
-    <div class="task-sidebar">
-      <div class="wobbly-box sidebar-box postit-card">
-        <div class="tack-decoration"></div>
-        <h3>Task Attributes</h3>
-        <hr class="hr-sketch" />
-
-        <div class="meta-field">
-          <label>Project:</label>
-          <a href={`/projects/${task.data.project}`} class="project-pill-link">
-            📁 {task.data.project}
-          </a>
-        </div>
-
-        <div class="meta-field">
-          <label>Assignee:</label>
-          <span class="assignee-tag">
-            {task.data.assignee.toLowerCase() === 'claude' || task.data.assignee.toLowerCase() === 'copilot' ? '🤖' : '🧑'} {task.data.assignee}
-          </span>
-        </div>
-
-        <div class="meta-field">
-          <label>Due Date:</label>
-          <span>{task.data.due || 'Not specified'}</span>
-        </div>
-
-        <div class="meta-field">
-          <label>Created:</label>
-          <span>{task.data.created}</span>
-        </div>
-
-        <div class="meta-field">
-          <label>Tags:</label>
-          <div class="tags-row">
-            {task.data.tags?.map((tag: string) => (
-              <span class="tag-pill">#{tag}</span>
-            ))}
-          </div>
-        </div>
-
-        <hr class="hr-sketch" />
-
-        <div class="quick-status-actions">
-          <label>Quick Update Status:</label>
-          <div class="status-btn-group">
-            <button type="button" class="btn-sketch btn-sketch-sm" data-status="todo">Todo</button>
-            <button type="button" class="btn-sketch btn-sketch-sm" data-status="in-progress">In Progress</button>
-            <button type="button" class="btn-sketch btn-sketch-sm" data-status="done">Done</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script is:inline define:vars={{ taskSlug }}>
-    const buttons = document.querySelectorAll('.status-btn-group button');
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const newStatus = btn.getAttribute('data-status');
-        try {
-          const res = await fetch(`/api/tasks/${taskSlug}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus }),
-          });
-          if (res.ok) {
-            window.location.reload();
-          }
-        } catch (err) {
-          console.error('Failed to update status:', err);
-        }
-      });
-    });
-  </script>
+<BaseLayout title={`Task - ${initialTask.title}`}>
+  <TaskEditor client:load initialTask={initialTask} projects={projects} />
 </BaseLayout>
-
-<style>
-  .task-detail-header {
-    margin: 1.5rem 0 2rem 0;
-  }
-  .breadcrumb {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: var(--muted-text);
-  }
-  .header-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .task-header-badges {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .task-detail-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-  }
-  .task-main-box {
-    background-color: #ffffff;
-    min-height: 450px;
-  }
-  .task-body-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .file-path-info {
-    font-size: 0.85rem;
-    color: var(--muted-text);
-  }
-  .markdown-body {
-    font-size: 1.15rem;
-    line-height: 1.6;
-  }
-  .subtasks-section {
-    margin-top: 1rem;
-  }
-  .subtask-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  .subtask-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background-color: rgba(0, 0, 0, 0.03);
-    border-radius: var(--wobbly-3);
-  }
-  .subtask-item a {
-    font-weight: 700;
-    color: var(--fg);
-  }
-  .task-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  .sidebar-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .meta-field {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.05rem;
-  }
-  .meta-field label {
-    font-family: var(--font-heading);
-    font-weight: 700;
-  }
-  .project-pill-link {
-    font-weight: 700;
-    color: var(--fg);
-    padding: 0.1rem 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background-color: #ffffff;
-  }
-  .assignee-tag {
-    font-weight: 700;
-  }
-  .tags-row {
-    display: flex;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-  }
-  .tag-pill {
-    font-size: 0.85rem;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-  }
-  .quick-status-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .status-btn-group {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-  .btn-sketch-sm {
-    font-size: 0.9rem;
-    padding: 0.25rem 0.6rem;
-  }
-  @media (max-width: 768px) {
-    .task-detail-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

@@ -1,54 +1,46 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import KanbanBoard from '../components/KanbanBoard';
+import { readTasksFromDisk } from '../lib/content';
 import { getCollection } from 'astro:content';
 
-const projects = await getCollection('projects');
-const tasks = await getCollection('tasks');
+const projectFilter = Astro.url.searchParams.get('project') || '';
 
-const initialTasks = tasks.map((t) => ({
-  slug: t.slug || t.id,
+const rawProjects = await getCollection('projects');
+const rawTasks = readTasksFromDisk();
+
+const projects = rawProjects.map(p => ({
+  slug: p.id.replace(/\.md$/, ''),
+  title: p.data.title,
+  columns: p.data.columns,
+  color: p.data.color,
+}));
+
+const tasks = rawTasks.map(t => ({
+  slug: t.id.replace(/\.md$/, ''),
   title: t.data.title,
   project: t.data.project,
   status: t.data.status,
   priority: t.data.priority,
   assignee: t.data.assignee,
   tags: t.data.tags,
-  due: t.data.due,
+  due: t.data.due ? String(t.data.due) : undefined,
   order: t.data.order,
   parent: t.data.parent,
-  created: t.data.created,
-  updated: t.data.updated,
-  content: t.body,
 }));
-
-const projectList = projects.map((p) => ({
-  slug: p.slug || p.id,
-  title: p.data.title,
-  color: p.data.color,
-  status: p.data.status,
-}));
-
-const selectedProject = Astro.url.searchParams.get('project') || '';
 ---
 
-<BaseLayout title="Orbit — Kanban Board">
-  <div class="board-header">
-    <div>
-      <h1>📋 Drag-and-Drop Board</h1>
-      <p class="subtitle">Drag cards between columns or reorder to instantly update <code>.md</code> files.</p>
+<BaseLayout title="Orbit - Kanban Board">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="font-size: 2rem; transform: rotate(-1deg);">📋 Workspace Board</h1>
     </div>
+
+    <KanbanBoard 
+      client:load 
+      initialTasks={tasks} 
+      projects={projects} 
+      initialProjectFilter={projectFilter} 
+    />
   </div>
-
-  <KanbanBoard client:load initialTasks={initialTasks} projects={projectList} selectedProject={selectedProject} />
 </BaseLayout>
-
-<style>
-  .board-header {
-    margin: 1.5rem 0 1rem 0;
-  }
-  .subtitle {
-    font-size: 1.15rem;
-    color: var(--muted-text);
-  }
-</style>

@@ -3,13 +3,17 @@ import BaseLayout from '../components/BaseLayout.astro';
 import QuickCreate from '../components/QuickCreate';
 import { getCollection } from 'astro:content';
 
-const projects = await getCollection('projects');
-const projectList = projects.map((p) => ({
-  slug: p.slug || p.id,
+const rawProjects = await getCollection('projects');
+const projects = rawProjects.map(p => ({
+  slug: p.id.replace(/\.md$/, ''),
   title: p.data.title,
+  color: p.data.color,
 }));
 ---
 
-<BaseLayout title="Orbit — Quick Create">
-  <QuickCreate client:load projects={projectList} />
+<BaseLayout title="Orbit - Quick Create">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <h1 style="font-size: 3rem; text-align: center; transform: rotate(-1deg);">✨ Quick Create</h1>
+    <QuickCreate client:load projects={projects} />
+  </div>
 </BaseLayout>

@@ -1,122 +1,46 @@
 ---
-interface Props {
-  currentPath?: string;
-}
-
-const { currentPath = '/' } = Astro.props;
-
-const navItems = [
-  { href: '/', label: '📊 Dashboard' },
-  { href: '/board', label: '📋 Board' },
-  { href: '/list', label: '📝 List' },
-  { href: '/agents', label: '🤖 Agents' },
-];
+const currentPath = Astro.url.pathname;
 ---
 
-<header class="nav-header">
-  <div class="nav-container">
-    <a href="/" class="brand-logo">
-      <span class="logo-icon">🪐</span>
-      <span class="logo-text">Orbit</span>
-    </a>
-
-    <nav class="nav-links">
-      {navItems.map((item) => {
-        const isActive = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href));
-        return (
-          <a href={item.href} class={`nav-item ${isActive ? 'active' : ''}`}>
-            {item.label}
-          </a>
-        );
-      })}
-    </nav>
-
-    <div class="nav-actions">
-      <a href="/new" class="btn-sketch btn-sketch-yellow">
-        ✏️ + New Item
-      </a>
-    </div>
-  </div>
-</header>
+<nav style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding: 0.25rem 0 1rem; margin-bottom: 1.25rem;">
+	<div style="font-family: var(--font-heading); font-size: 2.1rem; transform: rotate(-2deg);">
+		<a href="/">🪐 Orbit</a>
+	</div>
+	<ul style="list-style: none; display: flex; gap: 1.75rem; font-size: 1.3rem;">
+		<li><a href="/" class={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Dashboard</a></li>
+		<li><a href="/board" class={`nav-link ${currentPath.startsWith('/board') ? 'active' : ''}`}>Board</a></li>
+		<li><a href="/list" class={`nav-link ${currentPath.startsWith('/list') ? 'active' : ''}`}>List</a></li>
+		<li><a href="/agents" class={`nav-link ${currentPath.startsWith('/agents') ? 'active' : ''}`}>Agents</a></li>
+	</ul>
+	<div>
+		<a href="/new" class="sketch-button" style="padding: 0.4rem 1.15rem; font-size: 1.1rem;"><span>+ New Task</span></a>
+	</div>
+</nav>
 
 <style>
-  .nav-header {
-    background: #ffffff;
-    border-bottom: 3px solid var(--border);
-    box-shadow: 0 4px 0 0 rgba(45, 45, 45, 0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+	a {
+		color: var(--fg);
+	}
 
-  .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+	ul a {
+		text-decoration: none;
+	}
 
-  .brand-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--fg);
-    text-decoration: none !important;
-  }
+	ul a.active {
+		font-weight: bold;
+	}
 
-  .logo-icon {
-    font-size: 1.8rem;
-    transform: rotate(-10deg);
-    display: inline-block;
-  }
+	.nav-link {
+		display: inline-block;
+		transition: transform 0.15s ease, color 0.15s ease;
+	}
 
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-  }
+	.nav-link:hover {
+		color: var(--accent);
+		transform: translateY(-2px) rotate(-1deg);
+	}
 
-  .nav-item {
-    font-family: var(--font-heading);
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--fg);
-    padding: 0.25rem 0.5rem;
-    position: relative;
-    text-decoration: none !important;
-  }
-
-  .nav-item.active {
-    color: var(--accent-blue);
-  }
-
-  .nav-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--accent-blue);
-    border-radius: var(--wobbly-3);
-  }
-
-  .nav-item:hover {
-    color: var(--accent);
-  }
-
-  @media (max-width: 768px) {
-    .nav-container {
-      flex-wrap: wrap;
-    }
-    .nav-links {
-      gap: 0.75rem;
-    }
-  }
+	.nav-link:active {
+		transform: translateY(2px) scale(0.96);
+	}
 </style>

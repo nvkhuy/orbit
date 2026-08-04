@@ -1,0 +1,13 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary';
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+}
+
+const { variant = 'primary', type = 'button', class: className = '' } = Astro.props;
+---
+
+<button type={type} class={`sketch-button ${variant === 'secondary' ? 'secondary' : ''} ${className}`}>
+  <slot />
+</button>

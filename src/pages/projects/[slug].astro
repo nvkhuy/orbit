@@ -1,162 +1,77 @@
 ---
 import BaseLayout from '../../components/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import ProjectEditor from '../../components/ProjectEditor';
+import KanbanBoard from '../../components/KanbanBoard';
+import { readTasksFromDisk } from '../../lib/content';
+import { getCollection, getEntry } from 'astro:content';
 
-export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((p) => ({
-    params: { slug: p.slug || p.id },
-    props: { project: p },
-  }));
-}
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/');
 
-const { project } = Astro.props;
-const { Content } = await project.render();
+const projectEntry = await getEntry('projects', slug);
+if (!projectEntry) return Astro.redirect('/');
 
-const allTasks = await getCollection('tasks');
-const projectTasks = allTasks.filter(
-  (t) => t.data.project === (project.slug || project.id)
-);
+const rawProjects = await getCollection('projects');
+const rawTasks = readTasksFromDisk();
 
-const doneCount = projectTasks.filter((t) => t.data.status === 'done').length;
-const progress = projectTasks.length > 0 ? Math.round((doneCount / projectTasks.length) * 100) : 0;
+const projects = rawProjects.map(p => ({
+  slug: p.id.replace(/\.md$/, ''),
+  title: p.data.title,
+  columns: p.data.columns,
+  color: p.data.color,
+}));
+
+const tasks = rawTasks.map(t => ({
+  slug: t.id.replace(/\.md$/, ''),
+  title: t.data.title,
+  project: t.data.project,
+  status: t.data.status,
+  priority: t.data.priority,
+  assignee: t.data.assignee,
+  tags: t.data.tags,
+  due: t.data.due ? String(t.data.due) : undefined,
+  order: t.data.order,
+  parent: t.data.parent,
+}));
+
+const initialProject = {
+  slug: projectEntry.id.replace(/\.md$/, ''),
+  title: projectEntry.data.title,
+  status: projectEntry.data.status,
+  priority: projectEntry.data.priority,
+  columns: projectEntry.data.columns,
+  color: projectEntry.data.color,
+  body: projectEntry.body || '',
+};
+
+// Calculate progress percentage
+const projectTasks = tasks.filter(t => t.project === initialProject.slug);
+const doneCount = projectTasks.filter(t => t.status === 'done').length;
+const progressPct = projectTasks.length > 0 ? Math.round((doneCount / projectTasks.length) * 100) : 0;
 ---
 
-<BaseLayout title={`Orbit — Project: ${project.data.title}`}>
-  <div class="project-detail-header">
-    <div class="header-left">
-      <div class="project-badges">
-        <span class={`badge-sketch badge-${project.data.status}`}>{project.data.status}</span>
-        <span class={`badge-sketch badge-${project.data.priority}`}>{project.data.priority}</span>
+<BaseLayout title={`Project - ${initialProject.title}`}>
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    {/* Project Header Card */}
+    <ProjectEditor client:load initialProject={initialProject} />
+
+    {/* Hand-Drawn Progress Bar */}
+    <div class="sketch-card" style="padding: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 0.5rem;">
+        <span>Project Progress</span>
+        <span>{doneCount} / {projectTasks.length} Done ({progressPct}%)</span>
       </div>
-      <h1>📁 {project.data.title}</h1>
-    </div>
-
-    <div class="header-right">
-      <a href={`/board?project=${project.slug || project.id}`} class="btn-sketch btn-sketch-yellow">
-        📋 View in Kanban
-      </a>
-      <a href="/new" class="btn-sketch">
-        + Add Task
-      </a>
-    </div>
-  </div>
-
-  <div class="project-detail-grid">
-    <!-- Main Content & Description -->
-    <div class="wobbly-box project-main-box">
-      <h2>Project Overview & Notes</h2>
-      <hr class="hr-sketch" />
-      <div class="markdown-body">
-        <Content />
+      <div class="wobbly-border-sm" style="height: 24px; background-color: var(--muted); overflow: hidden; padding: 2px;">
+        <div 
+          style={`height: 100%; width: ${progressPct}%; background-color: var(--accent); border-radius: 4px; transition: width 0.3s ease;`}
+        />
       </div>
     </div>
 
-    <!-- Sidebar Stats & Task List -->
-    <div class="project-sidebar">
-      <div class="wobbly-box sidebar-box postit-card">
-        <div class="tape-decoration"></div>
-        <h3>Project Progress</h3>
-        <div class="progress-number">{progress}%</div>
-        <p>{doneCount} of {projectTasks.length} tasks completed</p>
-        <div class="sketch-progress-bar" style="margin-top: 0.75rem;">
-          <div class="progress-fill" style={`width: ${progress}%`}></div>
-        </div>
-      </div>
-
-      <div class="wobbly-box sidebar-box">
-        <h3>Project Tasks</h3>
-        {projectTasks.length === 0 ? (
-          <p class="empty-text">No tasks created yet for this project.</p>
-        ) : (
-          <ul class="task-list">
-            {projectTasks.map((t) => (
-              <li class="task-item">
-                <a href={`/tasks/${t.slug || t.id}`} class="task-link">
-                  {t.data.title}
-                </a>
-                <span class={`badge-sketch badge-${t.data.status}`}>{t.data.status}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+    {/* Filtered Project Kanban Board */}
+    <div>
+      <h2 style="font-size: 2.25rem; margin-bottom: 1rem; transform: rotate(-1deg);">Project Board</h2>
+      <KanbanBoard client:load initialTasks={tasks} projects={projects} initialProjectFilter={initialProject.slug} />
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .project-detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin: 1.5rem 0 2rem 0;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  .project-badges {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .header-right {
-    display: flex;
-    gap: 0.75rem;
-  }
-  .project-detail-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-  }
-  .project-main-box {
-    background-color: #ffffff;
-    min-height: 400px;
-  }
-  .markdown-body {
-    font-size: 1.15rem;
-    line-height: 1.6;
-  }
-  .project-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  .sidebar-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .progress-number {
-    font-family: var(--font-heading);
-    font-size: 2.8rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .task-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  .task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.05rem;
-  }
-  .task-link {
-    font-weight: 700;
-    color: var(--fg);
-  }
-  .empty-text {
-    color: var(--muted-text);
-    margin-top: 0.5rem;
-  }
-  @media (max-width: 768px) {
-    .project-detail-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

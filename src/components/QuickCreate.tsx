@@ -1,260 +1,281 @@
 import { useState } from 'preact/hooks';
-import type { ProjectItem } from './KanbanBoard';
+import type { Project } from './KanbanBoard';
+import SketchSelect from './SketchSelect';
 
-interface Props {
-  projects: ProjectItem[];
+interface QuickCreateProps {
+  projects: Project[];
 }
 
-export default function QuickCreate({ projects }: Props) {
-  const [type, setType] = useState<'task' | 'project'>('task');
-  const [title, setTitle] = useState('');
-  const [project, setProject] = useState(projects[0]?.slug || 'orbit');
-  const [status, setStatus] = useState('todo');
-  const [priority, setPriority] = useState('medium');
-  const [assignee, setAssignee] = useState('huy');
-  const [tags, setTags] = useState('');
-  const [due, setDue] = useState('');
-  const [content, setContent] = useState('');
-  const [color, setColor] = useState('#fff9c4');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; isError?: boolean } | null>(null);
+export default function QuickCreate({ projects }: QuickCreateProps) {
+  const [mode, setMode] = useState<'task' | 'project'>('task');
 
-  const handleSubmit = async (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
+  // Task form state
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskProject, setTaskProject] = useState(projects[0]?.slug || 'orbit');
+  const [taskPriority, setTaskPriority] = useState('medium');
+  const [taskAssignee, setTaskAssignee] = useState('');
+  const [taskStatus, setTaskStatus] = useState('todo');
+  const [taskContent, setTaskContent] = useState('');
+
+  // Project form state
+  const [projTitle, setProjTitle] = useState('');
+  const [projPriority, setProjPriority] = useState('medium');
+  const [projColor, setProjColor] = useState('#fff9c4');
+  const [projContent, setProjContent] = useState('');
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const projectOptions = projects.map(p => ({ value: p.slug, label: p.title }));
+  const priorityOptions = [
+    { value: 'critical', label: '🔥 Critical' },
+    { value: 'high', label: '⚡ High' },
+    { value: 'medium', label: '📌 Medium' },
+    { value: 'low', label: '🌱 Low' },
+  ];
+  const statusOptions = [
+    { value: 'todo', label: 'Todo' },
+    { value: 'in-progress', label: 'In Progress' },
+    { value: 'in-review', label: 'In Review' },
+    { value: 'done', label: 'Done' },
+  ];
+
+  const handleCreateTask = async (e: Event) => {
     e.preventDefault();
-    if (!title.trim()) {
-      setMessage({ text: 'Title is required!', isError: true });
-      return;
-    }
+    if (!taskTitle.trim()) return;
 
     setLoading(true);
-    setMessage(null);
+    setMessage('');
 
     try {
-      if (type === 'task') {
-        const res = await fetch('/api/tasks', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            project,
-            status,
-            priority,
-            assignee,
-            tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-            due,
-            content,
-          }),
-        });
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: taskTitle,
+          project: taskProject,
+          priority: taskPriority,
+          assignee: taskAssignee,
+          status: taskStatus,
+          content: taskContent,
+        }),
+      });
 
-        const data = await res.json();
-        if (res.ok) {
-          setMessage({ text: `Task created! Created file src/content/tasks/${data.slug}.md` });
-          setTimeout(() => {
-            window.location.href = `/tasks/${data.slug}`;
-          }, 800);
-        } else {
-          setMessage({ text: data.error || 'Failed to create task', isError: true });
-        }
+      const data = await res.json();
+      if (data.success) {
+        setMessage(`Task created successfully! Redirecting...`);
+        setTimeout(() => {
+          window.location.href = `/tasks/${data.slug}`;
+        }, 1000);
       } else {
-        const res = await fetch('/api/projects', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            status,
-            priority,
-            color,
-            tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-            content,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          setMessage({ text: `Project created! Created file src/content/projects/${data.slug}.md` });
-          setTimeout(() => {
-            window.location.href = `/projects/${data.slug}`;
-          }, 800);
-        } else {
-          setMessage({ text: data.error || 'Failed to create project', isError: true });
-        }
+        setMessage(`Error: ${data.error}`);
       }
-    } catch (err: any) {
-      setMessage({ text: err.message || 'Error occurred', isError: true });
+    } catch (err) {
+      setMessage('Failed to create task');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateProject = async (e: Event) => {
+    e.preventDefault();
+    if (!projTitle.trim()) return;
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: projTitle,
+          priority: projPriority,
+          color: projColor,
+          content: projContent,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMessage(`Project created successfully! Redirecting...`);
+        setTimeout(() => {
+          window.location.href = `/projects/${data.slug}`;
+        }, 1000);
+      } else {
+        setMessage(`Error: ${data.error}`);
+      }
+    } catch (err) {
+      setMessage('Failed to create project');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="wobbly-box-md postit-card create-form-container">
-      <div className="tape-decoration"></div>
-
-      <h2 className="form-header">✏️ Quick Create</h2>
-      <p className="form-subtitle">Creating an item directly writes a <code>.md</code> file in <code>src/content/</code>.</p>
-
-      <div className="type-toggle-buttons">
+    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+      {/* Mode Switcher */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', justifyContent: 'center' }}>
         <button
-          type="button"
-          className={`btn-sketch ${type === 'task' ? 'btn-sketch-yellow' : 'btn-sketch-secondary'}`}
-          onClick={() => setType('task')}
+          class={`sketch-button ${mode === 'task' ? '' : 'secondary'}`}
+          onClick={() => setMode('task')}
+          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem' }}
         >
-          📌 Task
+          ✏️ Create Task
         </button>
         <button
-          type="button"
-          className={`btn-sketch ${type === 'project' ? 'btn-sketch-yellow' : 'btn-sketch-secondary'}`}
-          onClick={() => setType('project')}
+          class={`sketch-button ${mode === 'project' ? '' : 'secondary'}`}
+          onClick={() => setMode('project')}
+          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem' }}
         >
-          📁 Project
+          📁 Create Project
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="create-form">
-        {message && (
-          <div className={`form-alert ${message.isError ? 'alert-error' : 'alert-success'}`}>
-            {message.text}
-          </div>
-        )}
-
-        <div className="form-field">
-          <label className="field-label">Title *</label>
-          <input
-            type="text"
-            className="input-sketch"
-            placeholder={type === 'task' ? 'e.g. Implement drag-and-drop' : 'e.g. New Awesome Project'}
-            value={title}
-            onInput={(e) => setTitle((e.target as HTMLInputElement).value)}
-            required
-          />
+      {message && (
+        <div 
+          class="wobbly-border-sm" 
+          style={{ padding: '0.75rem', marginBottom: '1.25rem', backgroundColor: '#e8f5e9', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '1.1rem' }}
+        >
+          {message}
         </div>
+      )}
 
-        {type === 'task' ? (
-          <>
-            <div className="form-row">
-              <div className="form-field">
-                <label className="field-label">Project</label>
-                <select
-                  className="input-sketch input-select"
-                  value={project}
-                  onChange={(e) => setProject((e.target as HTMLSelectElement).value)}
-                >
-                  {projects.map((p) => (
-                    <option key={p.slug} value={p.slug}>
-                      {p.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      {/* Task Creation Form */}
+      {mode === 'task' ? (
+        <form onSubmit={handleCreateTask} class="sketch-card postit" data-decoration="tape" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem; text-align: center;">New Task Card</h2>
 
-              <div className="form-field">
-                <label className="field-label">Status</label>
-                <select
-                  className="input-sketch input-select"
-                  value={status}
-                  onChange={(e) => setStatus((e.target as HTMLSelectElement).value)}
-                >
-                  <option value="todo">Todo</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="in-review">In Review</option>
-                  <option value="done">Done</option>
-                  <option value="blocked">Blocked</option>
-                </select>
-              </div>
-            </div>
+          <div>
+            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Task Title *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Design Board View"
+              value={taskTitle}
+              onInput={(e: any) => setTaskTitle(e.target.value)}
+              class="sketch-input"
+            />
+          </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label className="field-label">Priority</label>
-                <select
-                  className="input-sketch input-select"
-                  value={priority}
-                  onChange={(e) => setPriority((e.target as HTMLSelectElement).value)}
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label className="field-label">Assignee</label>
-                <input
-                  type="text"
-                  className="input-sketch"
-                  placeholder="e.g. huy or claude"
-                  value={assignee}
-                  onInput={(e) => setAssignee((e.target as HTMLInputElement).value)}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-field">
-                <label className="field-label">Tags (comma separated)</label>
-                <input
-                  type="text"
-                  className="input-sketch"
-                  placeholder="dev, ui, frontend"
-                  value={tags}
-                  onInput={(e) => setTags((e.target as HTMLInputElement).value)}
-                />
-              </div>
-
-              <div className="form-field">
-                <label className="field-label">Due Date</label>
-                <input
-                  type="date"
-                  className="input-sketch"
-                  value={due}
-                  onChange={(e) => setDue((e.target as HTMLInputElement).value)}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="form-row">
-            <div className="form-field">
-              <label className="field-label">Project Card Color</label>
-              <input
-                type="color"
-                className="input-sketch color-picker"
-                value={color}
-                onChange={(e) => setColor((e.target as HTMLInputElement).value)}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Project</label>
+              <SketchSelect
+                value={taskProject}
+                options={projectOptions}
+                onChange={(val) => setTaskProject(val)}
+                style={{ width: '100%' }}
               />
             </div>
 
-            <div className="form-field">
-              <label className="field-label">Tags (comma separated)</label>
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Priority</label>
+              <SketchSelect
+                value={taskPriority}
+                options={priorityOptions}
+                onChange={(val) => setTaskPriority(val)}
+                style={{ width: '100%' }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Assignee</label>
               <input
                 type="text"
-                className="input-sketch"
-                placeholder="dev, app, open-source"
-                value={tags}
-                onInput={(e) => setTags((e.target as HTMLInputElement).value)}
+                placeholder="e.g. huy or claude"
+                value={taskAssignee}
+                onInput={(e: any) => setTaskAssignee(e.target.value)}
+                class="sketch-input"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Initial Status</label>
+              <SketchSelect
+                value={taskStatus}
+                options={statusOptions}
+                onChange={(val) => setTaskStatus(val)}
+                style={{ width: '100%' }}
               />
             </div>
           </div>
-        )}
 
-        <div className="form-field">
-          <label className="field-label">Markdown Content / Notes</label>
-          <textarea
-            className="input-sketch textarea-sketch"
-            rows={4}
-            placeholder="Write description, checklist, or agent notes in Markdown..."
-            value={content}
-            onInput={(e) => setContent((e.target as HTMLTextAreaElement).value)}
-          ></textarea>
-        </div>
+          <div>
+            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Task Notes / Description (Markdown)</label>
+            <textarea
+              rows={4}
+              placeholder="Add details, checklists, links..."
+              value={taskContent}
+              onInput={(e: any) => setTaskContent(e.target.value)}
+              class="sketch-input"
+              style={{ fontFamily: 'var(--font-body)', resize: 'vertical' }}
+            />
+          </div>
 
-        <div className="form-actions">
-          <button type="submit" className="btn-sketch" disabled={loading}>
-            {loading ? 'Writing .md file...' : `🚀 Save ${type === 'task' ? 'Task' : 'Project'}`}
+          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem' }}>
+            {loading ? 'Creating...' : '💾 Pin Task to Board'}
           </button>
-        </div>
-      </form>
+        </form>
+      ) : (
+        /* Project Creation Form */
+        <form onSubmit={handleCreateProject} class="sketch-card" data-decoration="tack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem; text-align: center;">New Project Folder</h2>
+
+          <div>
+            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Project Name *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Side Hustle"
+              value={projTitle}
+              onInput={(e: any) => setProjTitle(e.target.value)}
+              class="sketch-input"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Priority</label>
+              <SketchSelect
+                value={projPriority}
+                options={priorityOptions}
+                onChange={(val) => setProjPriority(val)}
+                style={{ width: '100%' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Post-it Color</label>
+              <input
+                type="color"
+                value={projColor}
+                onInput={(e: any) => setProjColor(e.target.value)}
+                class="sketch-input"
+                style={{ height: '38px', padding: '0.1rem 0.2rem' }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Project Description (Markdown)</label>
+            <textarea
+              rows={4}
+              placeholder="Goals, target milestones, tech stack..."
+              value={projContent}
+              onInput={(e: any) => setProjContent(e.target.value)}
+              class="sketch-input"
+              style={{ fontFamily: 'var(--font-body)', resize: 'vertical' }}
+            />
+          </div>
+
+          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem' }}>
+            {loading ? 'Creating...' : '📁 Launch Project'}
+          </button>
+        </form>
+      )}
     </div>
   );
 }

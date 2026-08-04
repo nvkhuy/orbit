@@ -1,318 +1,155 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import Badge from '../components/Badge.astro';
+import { readTasksFromDisk } from '../lib/content';
 import { getCollection } from 'astro:content';
 
-const projects = await getCollection('projects');
-const tasks = await getCollection('tasks');
+const rawProjects = await getCollection('projects');
+const rawTasks = readTasksFromDisk();
 
+const projects = rawProjects.map(p => ({
+  slug: p.id.replace(/\.md$/, ''),
+  title: p.data.title,
+  status: p.data.status,
+  priority: p.data.priority,
+  color: p.data.color || '#fff9c4',
+  tags: p.data.tags,
+}));
+
+const tasks = rawTasks.map(t => ({
+  slug: t.id.replace(/\.md$/, ''),
+  title: t.data.title,
+  project: t.data.project,
+  status: t.data.status,
+  priority: t.data.priority,
+  assignee: t.data.assignee,
+  updated: String(t.data.updated),
+}));
+
+// Quick Stats
 const totalTasks = tasks.length;
-const doneTasks = tasks.filter((t) => t.data.status === 'done').length;
-const inProgressTasks = tasks.filter((t) => t.data.status === 'in-progress').length;
-const todoTasks = tasks.filter((t) => t.data.status === 'todo').length;
-
-const completionPercentage = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
-
-// Project stats mapping
-const projectStats = projects.map((p) => {
-  const pTasks = tasks.filter((t) => t.data.project === p.slug || t.data.project === p.id);
-  const pDone = pTasks.filter((t) => t.data.status === 'done').length;
-  const percent = pTasks.length > 0 ? Math.round((pDone / pTasks.length) * 100) : 0;
-  return {
-    ...p,
-    taskCount: pTasks.length,
-    doneCount: pDone,
-    progress: percent,
-  };
-});
-
-const recentTasks = [...tasks]
-  .sort((a, b) => new Date(b.data.updated).getTime() - new Date(a.data.updated).getTime())
-  .slice(0, 5);
+const doneTasks = tasks.filter(t => t.status === 'done').length;
+const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
+const todoTasks = tasks.filter(t => t.status === 'todo').length;
 ---
 
-<BaseLayout title="Orbit — Workspace Dashboard">
-  <div class="dashboard-header">
-    <div class="header-titles">
-      <h1>📊 Workspace Dashboard</h1>
-      <p class="subtitle">Real-time overview of projects and tasks powered by local Markdown files.</p>
+<BaseLayout title="Orbit - Workspace Dashboard">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
+    {/* Hero Section */}
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 0.75rem;">
+      <div>
+        <h1 style="font-size: 1.6rem; transform: rotate(-1deg);">🪐 Orbit Workspace</h1>
+        <p style="font-size: 1.05rem; color: var(--fg); opacity: 0.85;">
+          Where humans & AI agents revolve around one shared Markdown workspace.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/new" class="sketch-button" style="font-size: 0.95rem; padding: 0.35rem 1rem;">+ New Item</a>
+        <a href="/board" class="sketch-button secondary" style="font-size: 0.95rem; padding: 0.35rem 1rem;">📋 View Board</a>
+      </div>
     </div>
 
-    <div class="header-cta">
-      <a href="/new" class="btn-sketch btn-sketch-yellow">
-        ✏️ Quick Create
-      </a>
-      <a href="/board" class="btn-sketch">
-        📋 Open Board
-      </a>
-    </div>
-  </div>
-
-  <!-- Overall Stat Cards Grid -->
-  <div class="stats-grid">
-    <div class="wobbly-box stat-card postit-card">
-      <div class="tack-decoration"></div>
-      <div class="stat-icon">📈</div>
-      <div class="stat-number">{completionPercentage}%</div>
-      <div class="stat-label">Overall Completion</div>
-    </div>
-
-    <div class="wobbly-box stat-card">
-      <div class="stat-icon">📁</div>
-      <div class="stat-number">{projects.length}</div>
-      <div class="stat-label">Active Projects</div>
+    {/* Quick Stats Grid */}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+      <div class="sketch-card" style="text-align: center; padding: 0.75rem 1rem;">
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--fg); line-height: 1.1;">{totalTasks}</div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">Total Tasks</div>
+      </div>
+      <div class="sketch-card" style="text-align: center; padding: 0.75rem 1rem; background-color: #e8f5e9;">
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--fg); line-height: 1.1;">{doneTasks}</div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">Done</div>
+      </div>
+      <div class="sketch-card" style="text-align: center; padding: 0.75rem 1rem; background-color: #e3f2fd;">
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--fg); line-height: 1.1;">{inProgressTasks}</div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">In Progress</div>
+      </div>
+      <div class="sketch-card" style="text-align: center; padding: 0.75rem 1rem; background-color: #fffde7;">
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--fg); line-height: 1.1;">{todoTasks}</div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">To Do</div>
+      </div>
     </div>
 
-    <div class="wobbly-box stat-card">
-      <div class="stat-icon">📌</div>
-      <div class="stat-number">{totalTasks}</div>
-      <div class="stat-label">Total Tasks</div>
-    </div>
+    {/* Active Projects Cards */}
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.6rem; transform: rotate(1deg);">📁 Active Projects</h2>
+        <a href="/new" style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--blue);">+ New Project</a>
+      </div>
 
-    <div class="wobbly-box stat-card">
-      <div class="stat-icon">✏️</div>
-      <div class="stat-number">{inProgressTasks}</div>
-      <div class="stat-label">In Progress</div>
-    </div>
-  </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;">
+        {projects.map((project, pIdx) => {
+          const pTasks = tasks.filter(t => t.project === project.slug);
+          const pDone = pTasks.filter(t => t.status === 'done').length;
+          const pct = pTasks.length > 0 ? Math.round((pDone / pTasks.length) * 100) : 0;
+          const rot = pIdx % 2 === 0 ? '-1deg' : '1.5deg';
 
-  <hr class="hr-sketch" />
+          return (
+            <div 
+              class="sketch-card" 
+              data-decoration={pIdx % 2 === 0 ? "tape" : "tack"}
+              style={`background-color: ${project.color}; transform: rotate(${rot}); cursor: pointer; padding: 0.85rem 1.1rem;`}
+              onClick={`window.location.href='/projects/${project.slug}'`}
+            >
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <a href={`/projects/${project.slug}`} style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--fg);">
+                  {project.title}
+                </a>
+                <Badge color="#ffffff">{project.status}</Badge>
+              </div>
 
-  <!-- Active Projects Section -->
-  <section class="section-container">
-    <div class="section-title-bar">
-      <h2>📁 Projects Overview</h2>
-    </div>
+              {/* Progress Bar */}
+              <div style="margin-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                  <span>Progress</span>
+                  <span>{pDone}/{pTasks.length} ({pct}%)</span>
+                </div>
+                <div class="wobbly-border-sm" style="height: 12px; background-color: rgba(0,0,0,0.1); overflow: hidden;">
+                  <div style={`height: 100%; width: ${pct}%; background-color: var(--accent); transition: width 0.3s ease;`} />
+                </div>
+              </div>
 
-    <div class="projects-grid">
-      {projectStats.map((p) => (
-        <div class="wobbly-box project-card hover-rotate-1" style={`background-color: ${p.data.color || '#ffffff'}`}>
-          <div class="card-top">
-            <span class={`badge-sketch badge-${p.data.status}`}>{p.data.status}</span>
-            <span class={`badge-sketch badge-${p.data.priority}`}>{p.data.priority}</span>
-          </div>
-
-          <a href={`/projects/${p.slug || p.id}`} class="project-title-link">
-            <h3>{p.data.title}</h3>
-          </a>
-
-          <p class="project-tags">
-            {p.data.tags?.map((tag: string) => (
-              <span class="tag-pill">#{tag}</span>
-            ))}
-          </p>
-
-          <div class="progress-section">
-            <div class="progress-label-row">
-              <span>Progress</span>
-              <span>{p.progress}% ({p.doneCount}/{p.taskCount} done)</span>
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem;">
+                {project.tags?.map(tag => (
+                  <span style="font-size: 0.75rem; padding: 0.05rem 0.4rem; border: 1px solid var(--border); border-radius: 6px; background-color: rgba(255,255,255,0.6);">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div class="sketch-progress-bar">
-              <div class="progress-fill" style={`width: ${p.progress}%`}></div>
+          );
+        })}
+      </div>
+    </div>
+
+    {/* Recent Tasks */}
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.6rem; transform: rotate(-1deg);">📌 Recent Tasks</h2>
+        <a href="/list" style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--blue);">View All Tasks →</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+        {tasks.slice(0, 6).map((task, tIdx) => (
+          <div 
+            class="sketch-card" 
+            style={`cursor: pointer; transform: rotate(${tIdx % 2 === 0 ? '1deg' : '-1deg'}); padding: 0.75rem 0.9rem;`}
+            onClick={`window.location.href='/tasks/${task.slug}'`}
+          >
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">
+              <a href={`/tasks/${task.slug}`}>{task.title}</a>
+            </h3>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <Badge color={task.status === 'done' ? '#c8e6c9' : task.status === 'in-progress' ? '#bbdefb' : '#fff9c4'}>
+                {task.status}
+              </Badge>
+              <span style="font-size: 0.8rem; color: #666;">in {task.project}</span>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <hr class="hr-sketch" />
-
-  <!-- Recent Tasks Activity -->
-  <section class="section-container">
-    <div class="section-title-bar">
-      <h2>🕒 Recent Activity</h2>
-      <a href="/list" class="view-all-link">View all tasks →</a>
+        ))}
+      </div>
     </div>
 
-    <div class="recent-tasks-list">
-      {recentTasks.map((t) => (
-        <div class="wobbly-box-sm recent-task-item">
-          <div class="task-info">
-            <span class={`badge-sketch badge-${t.data.status}`}>{t.data.status}</span>
-            <a href={`/tasks/${t.slug || t.id}`} class="task-title">{t.data.title}</a>
-            <span class="project-tag">[{t.data.project}]</span>
-          </div>
-          <div class="task-meta">
-            <span class="assignee">Assigned to <strong>{t.data.assignee}</strong></span>
-            <span class="updated-time">{t.data.updated}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
+  </div>
 </BaseLayout>
-
-<style>
-  .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin: 1.5rem 0 2rem 0;
-    flex-wrap: wrap;
-  }
-
-  .subtitle {
-    font-size: 1.2rem;
-    color: var(--muted-text);
-    margin-top: 0.25rem;
-  }
-
-  .header-cta {
-    display: flex;
-    gap: 1rem;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
-  }
-
-  .stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem 1rem;
-  }
-
-  .stat-icon {
-    font-size: 2.2rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-number {
-    font-family: var(--font-heading);
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1;
-    color: var(--fg);
-  }
-
-  .stat-label {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--muted-text);
-    margin-top: 0.25rem;
-  }
-
-  .section-container {
-    margin: 2rem 0;
-  }
-
-  .section-title-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-  }
-
-  .view-all-link {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .project-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .project-title-link {
-    color: var(--fg);
-    text-decoration: none !important;
-  }
-
-  .project-title-link h3 {
-    font-size: 1.5rem;
-  }
-
-  .project-tags {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-  }
-
-  .tag-pill {
-    font-size: 0.85rem;
-    color: var(--muted-text);
-    background-color: rgba(0, 0, 0, 0.05);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-  }
-
-  .progress-section {
-    margin-top: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .progress-label-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.95rem;
-    font-weight: 700;
-  }
-
-  .sketch-progress-bar {
-    height: 14px;
-    background-color: rgba(0, 0, 0, 0.08);
-    border: 2px solid var(--border);
-    border-radius: var(--wobbly-3);
-    overflow: hidden;
-    position: relative;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background-color: var(--accent-green);
-    transition: width 0.3s ease;
-  }
-
-  .recent-tasks-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
-
-  .recent-task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .task-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .task-title {
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--fg);
-  }
-
-  .project-tag {
-    font-size: 0.9rem;
-    color: var(--muted-text);
-  }
-
-  .task-meta {
-    font-size: 0.95rem;
-    color: var(--muted-text);
-    display: flex;
-    gap: 1rem;
-  }
-</style>

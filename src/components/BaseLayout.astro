@@ -1,71 +1,32 @@
 ---
-import Nav from './Nav.astro';
 import '../styles/global.css';
 import '../styles/components.css';
 import '../styles/animations.css';
+import Nav from './Nav.astro';
 
 interface Props {
-  title?: string;
-  currentPath?: string;
+	title?: string;
 }
 
-const { title = 'Orbit — Project Management for Humans & AI Agents', currentPath } = Astro.props;
+const { title = "Orbit" } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
-    <meta name="description" content="Serverless, local-first markdown project management app for humans and AI agents." />
-  </head>
-  <body>
-    <Nav currentPath={currentPath ?? Astro.url.pathname} />
-
-    <main class="container">
-      <slot />
-    </main>
-
-    <footer class="footer">
-      <div class="footer-container">
-        <p>🪐 <strong>Orbit</strong> — Projects and agents revolve around one shared workspace.</p>
-        <p class="footer-sub">Serverless · Markdown-powered · Built for Humans & AI Agents</p>
-      </div>
-    </footer>
-
-    <style>
-      .footer {
-        margin-top: 4rem;
-        padding: 2rem 1.5rem;
-        border-top: 2.5px solid var(--border);
-        background: #ffffff;
-        text-align: center;
-      }
-      .footer-container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-      .footer-sub {
-        font-size: 0.95rem;
-        color: var(--muted-text);
-        margin-top: 0.25rem;
-      }
-    </style>
-
-    <script>
-      // Global keyboard shortcut: 'n' for new, 'b' for board, '/' for focus search
-      window.addEventListener('keydown', (e) => {
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
-          return;
-        }
-        if (e.key === 'n' || e.key === 'N') {
-          window.location.href = '/new';
-        } else if (e.key === 'b' || e.key === 'B') {
-          window.location.href = '/board';
-        }
-      });
-    </script>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Orbit - Serverless local-first project management app" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<div style="max-width: 1320px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+			<Nav />
+			<main style="margin-top: 1.25rem;">
+				<slot />
+			</main>
+		</div>
+	</body>
 </html>

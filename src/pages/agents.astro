@@ -1,179 +1,48 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import Badge from '../components/Badge.astro';
 import { getCollection } from 'astro:content';
 
 const agents = await getCollection('agents');
-const tasks = await getCollection('tasks');
-
-const agentWorkload = agents.map((a) => {
-  const name = a.data.name;
-  const assignedTasks = tasks.filter((t) => t.data.assignee.toLowerCase() === name.toLowerCase());
-  const doneCount = assignedTasks.filter((t) => t.data.status === 'done').length;
-
-  return {
-    ...a,
-    taskCount: assignedTasks.length,
-    doneCount,
-    assignedTasks,
-  };
-});
 ---
 
-<BaseLayout title="Orbit — Agent Hub">
-  <div class="agents-header">
-    <div>
-      <h1>🤖 Agent Hub</h1>
-      <p class="subtitle">AI Agents and Human Maintainers collaborating in one shared Markdown workspace.</p>
+<BaseLayout title="Orbit - Agent Hub">
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="font-size: 3rem; transform: rotate(-1deg);">🤖 Agent Hub</h1>
     </div>
-  </div>
+    
+    <p style="font-size: 1.25rem;">
+      Agents in Orbit read and write markdown files directly. Below are registered human & AI collaborators:
+    </p>
 
-  <div class="agents-grid">
-    {agentWorkload.map((a) => (
-      <div class={`wobbly-box agent-card ${a.data.type === 'ai' ? 'postit-card' : ''}`}>
-        {a.data.type === 'ai' && <div class="tape-decoration"></div>}
-
-        <div class="agent-card-header">
-          <div class="agent-avatar">
-            {a.data.type === 'ai' ? '🤖' : '🧑'}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
+      {agents.map(agent => (
+        <Card decoration={agent.data.type === 'ai' ? 'tape' : 'tack'} postit={agent.data.type === 'ai'}>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h2 style="font-size: 2rem;">{agent.data.name}</h2>
+            <Badge color={agent.data.type === 'ai' ? '#bbdefb' : '#c8e6c9'}>
+              {agent.data.type === 'ai' ? '🤖 AI Agent' : '🧑 Human'}
+            </Badge>
           </div>
-          <div>
-            <h2>{a.data.name}</h2>
-            <span class={`badge-sketch ${a.data.type === 'ai' ? 'badge-high' : 'badge-low'}`}>
-              {a.data.type === 'ai' ? 'AI Agent' : 'Human Maintainer'}
-            </span>
-          </div>
-        </div>
 
-        <div class="agent-details">
-          <p><strong>Assigned Tasks:</strong> {a.taskCount} ({a.doneCount} completed)</p>
-          <p><strong>Last Active:</strong> {a.data.last_active || 'Recently'}</p>
-
-          <div class="permissions-block">
-            <strong>Permissions:</strong>
-            <div class="perm-tags">
-              {a.data.permissions?.map((p: string) => (
-                <span class="badge-sketch badge-todo">{p}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <hr class="hr-sketch" />
-
-        <div class="agent-tasks">
-          <h4>Active Assigned Work:</h4>
-          {a.assignedTasks.length === 0 ? (
-            <p class="empty-tasks">No active tasks assigned.</p>
-          ) : (
-            <ul>
-              {a.assignedTasks.map((t) => (
-                <li>
-                  <a href={`/tasks/${t.slug || t.id}`}>{t.data.title}</a>
-                  <span class={`badge-sketch badge-${t.data.status}`}>{t.data.status}</span>
-                </li>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+            <p><strong>Permissions:</strong></p>
+            <ul style="padding-left: 1.25rem;">
+              {agent.data.permissions.map(perm => (
+                <li style="font-size: 1.1rem; color: var(--fg);">{perm}</li>
               ))}
             </ul>
+          </div>
+
+          {agent.data.last_active && (
+            <div style="margin-top: 1rem; font-size: 0.9rem; color: #666; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
+              Last Active: {String(agent.data.last_active)}
+            </div>
           )}
-        </div>
-      </div>
-    ))}
+        </Card>
+      ))}
+    </div>
   </div>
-
-  <hr class="hr-sketch" />
-
-  <section class="cli-guide-section wobbly-box-md">
-    <h2>💻 CLI & Filesystem Integration for AI Agents</h2>
-    <p>AI agents can read and write <code>src/content/tasks/*.md</code> files directly or use the <code>orbit</code> CLI tool:</p>
-
-    <pre class="code-block"><code># Create task as Claude
-npx orbit task create --project orbit --title "Refactor UI" --priority high --assignee claude
-
-# Update task status to done
-npx orbit task done orbit--refactor-ui
-
-# Output workspace summary for agent prompt
-npx orbit summary</code></pre>
-  </section>
 </BaseLayout>
-
-<style>
-  .agents-header {
-    margin: 1.5rem 0 2rem 0;
-  }
-  .subtitle {
-    font-size: 1.15rem;
-    color: var(--muted-text);
-  }
-  .agents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-  }
-  .agent-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .agent-card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .agent-avatar {
-    font-size: 2.5rem;
-  }
-  .agent-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 1.05rem;
-  }
-  .permissions-block {
-    margin-top: 0.25rem;
-  }
-  .perm-tags {
-    display: flex;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-    margin-top: 0.25rem;
-  }
-  .agent-tasks h4 {
-    font-size: 1.15rem;
-    margin-bottom: 0.5rem;
-  }
-  .agent-tasks ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  .agent-tasks li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1rem;
-  }
-  .agent-tasks a {
-    font-weight: 700;
-    color: var(--fg);
-  }
-  .empty-tasks {
-    color: var(--muted-text);
-    font-style: italic;
-  }
-  .cli-guide-section {
-    margin-top: 2.5rem;
-    background-color: #ffffff;
-  }
-  .code-block {
-    background-color: #2d2d2d;
-    color: #fdfbf7;
-    padding: 1.25rem;
-    border-radius: var(--wobbly-3);
-    overflow-x: auto;
-    font-family: monospace;
-    font-size: 0.95rem;
-    margin-top: 1rem;
-    line-height: 1.6;
-  }
-</style>

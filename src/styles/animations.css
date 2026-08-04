@@ -1,29 +1,16 @@
-/* Sketch Animations & Micro-interactions */
-
-@keyframes jiggle {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-1deg); }
-  75% { transform: rotate(1deg); }
-  100% { transform: rotate(0deg); }
-}
-
-@keyframes float-bounce {
+@keyframes bounce-subtle {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
 
-.hover-rotate-1:hover {
-  transform: rotate(1deg) scale(1.01);
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
 }
 
-.hover-rotate-2:hover {
-  transform: rotate(-1.5deg) scale(1.01);
+.hover-rotate:hover {
+  transform: rotate(1deg);
 }
 
-.animate-bounce-gentle {
-  animation: float-bounce 3s infinite ease-in-out;
-}
-
-.animate-jiggle:hover {
-  animation: jiggle 0.3s ease-in-out;
+.hover-rotate-reverse:hover {
+  transform: rotate(-1deg);
 }

@@ -1,0 +1,19 @@
+---
+interface Props {
+  type?: string;
+  placeholder?: string;
+  name?: string;
+  value?: string;
+  class?: string;
+}
+
+const { type = 'text', placeholder = '', name, value, class: className = '' } = Astro.props;
+---
+
+<input 
+  type={type} 
+  placeholder={placeholder}
+  name={name}
+  value={value}
+  class={`sketch-input ${className}`}
+/>

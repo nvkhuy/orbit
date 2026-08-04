@@ -1,0 +1,16 @@
+---
+interface Props {
+  decoration?: 'none' | 'tape' | 'tack';
+  postit?: boolean;
+  class?: string;
+}
+
+const { decoration = 'none', postit = false, class: className = '' } = Astro.props;
+---
+
+<div 
+  class={`sketch-card ${postit ? 'postit' : ''} ${className}`} 
+  data-decoration={decoration !== 'none' ? decoration : undefined}
+>
+  <slot />
+</div>

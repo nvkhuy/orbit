@@ -1,3 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text y=".9em" font-size="90">🪐</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Orbit">
+  <defs>
+    <linearGradient id="planet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff59d"/>
+      <stop offset="1" stop-color="#8bc4d8"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8b45a"/>
+      <stop offset="1" stop-color="#8c7441"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="32" cy="34" rx="25" ry="9" transform="rotate(25 32 34)" fill="none" stroke="url(#ring)" stroke-width="5"/>
+  <circle cx="32" cy="30" r="14" fill="url(#planet)" stroke="#2d2d2d" stroke-width="2"/>
+  <path d="M20 26c7 4 17 5 25 1M21 33c7 3 15 4 23 1" fill="none" stroke="#8ca48d" stroke-width="2" stroke-linecap="round" opacity=".75"/>
+  <path d="M10 22c3-3 6-4 9-4" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/>
 </svg>

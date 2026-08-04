@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./public/orbit-hero.jpg" alt="Orbit — Kanban board with hand-drawn sketch UI and integrated terminal for AI agents" width="100%" />
+
 # 🪐 Orbit
 
 ### Projects and agents revolve around one shared workspace.
@@ -15,16 +17,6 @@ No server. No database. Just markdown files, a beautiful UI, and a CLI.
 ![Preact](https://img.shields.io/badge/Preact-10.x-673AB8?style=for-the-badge&logo=preact&logoColor=white)
 ![Markdown](https://img.shields.io/badge/Data-Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)
-
-</div>
-
----
-
-<div align="center">
-
-<img src="./public/orbit-hero.jpg" alt="Orbit — Kanban board with hand-drawn sketch UI and integrated terminal for AI agents" width="100%" />
-
-<sub>Drag-and-drop board for humans · CLI + markdown files for AI agents · One workspace, zero servers.</sub>
 
 </div>
 

@@ -16,6 +16,27 @@ Plan projects, move work across a beautiful Kanban board, and keep every decisio
 
 </div>
 
+## See Orbit in action
+
+Orbit brings project visibility and task execution into one lightweight workspace.
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="./public/dashboard-preview.png" alt="Orbit project management dashboard showing active projects and task progress" />
+      <br />
+      <strong>Workspace dashboard</strong><br />
+      <sub>See project health, task counts, progress, and recent work at a glance.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="./public/project-board-preview.png" alt="Orbit Kanban board showing tasks grouped by todo, in progress, in review, and done" />
+      <br />
+      <strong>Project Kanban board</strong><br />
+      <sub>Filter, group, prioritize, assign, and move tasks through your workflow.</sub>
+    </td>
+  </tr>
+</table>
+
 ## Why Orbit?
 
 Most project tools put your work behind a database, a subscription, and a permission system that does not understand your development workflow. Orbit takes a different approach:

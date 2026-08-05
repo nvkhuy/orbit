@@ -1,10 +1,14 @@
 ---
+import OrbitLogo from './OrbitLogo.astro';
 const currentPath = Astro.url.pathname;
 ---
 
 <nav style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding: 0.25rem 0 1rem; margin-bottom: 1.25rem;">
 	<div style="font-family: var(--font-heading); font-size: 2.1rem; transform: rotate(-2deg);">
-		<a href="/">🪐 Orbit</a>
+		<a href="/" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+			<OrbitLogo size={38} />
+			<span>Orbit</span>
+		</a>
 	</div>
 	<ul style="list-style: none; display: flex; gap: 1.75rem; font-size: 1.3rem;">
 		<li><a href="/" class={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Dashboard</a></li>

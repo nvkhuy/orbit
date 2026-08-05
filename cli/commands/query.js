@@ -29,7 +29,7 @@ export function registerQueryCommands(program) {
         });
       }
 
-      console.log('# 🪐 Orbit Workspace Machine Summary\n');
+      console.log('# 🪐 Workspace Machine Summary\n');
       console.log(`Generated at: ${new Date().toISOString()}\n`);
 
       console.log('## Projects');

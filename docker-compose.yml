@@ -1,0 +1,13 @@
+services:
+  orbit:
+    build: .
+    container_name: orbit-app
+    ports:
+      - "4321:4321"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+    volumes:
+      # Mount local content directory so Markdown changes are persisted on host
+      - ./src/content:/app/src/content
+    restart: unless-stopped

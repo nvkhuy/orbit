@@ -44,8 +44,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
   const [dragOverTarget, setDragOverTarget] = useState<{ slug: string; position: 'above' | 'below' } | null>(null);
   const dragOverTargetRef = useRef<{ slug: string; position: 'above' | 'below' } | null>(null);
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
-  const dragPreviewRef = useRef<HTMLElement | null>(null);
-  const dragPointerOffsetRef = useRef({ x: 0, y: 0 });
   const lastDragEndAt = useRef(0);
   
   const [quickTitle, setQuickTitle] = useState<{ [col: string]: string }>({});
@@ -55,11 +53,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [isSavingModal, setIsSavingModal] = useState<boolean>(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
-
-  const removeDragPreview = () => {
-    dragPreviewRef.current?.remove();
-    dragPreviewRef.current = null;
-  };
 
   // The dev server intentionally ignores Markdown task writes to avoid a
   // full refresh during drag/drop. Read the persisted files once on mount so
@@ -96,8 +89,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [Boolean(activeTask), Boolean(taskToDelete)]);
-
-  useEffect(() => removeDragPreview, []);
 
   // Filter tasks
   const filteredTasks = useMemo(() => tasks.filter(task => {
@@ -153,55 +144,12 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
   // Handle Drag & Drop
   const handleDragStart = (slug: string, e: DragEvent) => {
-    const sourceCard = e.currentTarget as HTMLElement;
-    const sourceRect = sourceCard.getBoundingClientRect();
-    const dragPreview = sourceCard.cloneNode(true) as HTMLElement;
-
-    dragPointerOffsetRef.current = {
-      x: e.clientX - sourceRect.left,
-      y: e.clientY - sourceRect.top,
-    };
-
-    Object.assign(dragPreview.style, {
-      position: 'fixed',
-      left: `${sourceRect.left}px`,
-      top: `${sourceRect.top}px`,
-      width: `${sourceRect.width}px`,
-      height: `${sourceRect.height}px`,
-      margin: '0',
-      pointerEvents: 'none',
-      zIndex: '10001',
-      opacity: '0.92',
-      transform: `scale(${DRAGGED_TASK_SCALE})`,
-      transformOrigin: 'top left',
-      transition: 'none',
-    });
-
-    removeDragPreview();
     dragOverTargetRef.current = null;
-    document.body.appendChild(dragPreview);
-    dragPreviewRef.current = dragPreview;
-
     setDraggedTaskSlug(slug);
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', slug);
-
-      // Hide the browser-generated full-size ghost; the controlled preview
-      // above follows the pointer and preserves the intended scale.
-      const transparentDragImage = document.createElement('canvas');
-      transparentDragImage.width = 1;
-      transparentDragImage.height = 1;
-      e.dataTransfer.setDragImage(transparentDragImage, 0, 0);
     }
-  };
-
-  const handleDrag = (e: DragEvent) => {
-    if (!dragPreviewRef.current || (e.clientX === 0 && e.clientY === 0)) return;
-
-    const { x, y } = dragPointerOffsetRef.current;
-    dragPreviewRef.current.style.left = `${e.clientX - (x * DRAGGED_TASK_SCALE)}px`;
-    dragPreviewRef.current.style.top = `${e.clientY - (y * DRAGGED_TASK_SCALE)}px`;
   };
 
   const handleDragOverColumn = (columnId: string, e: DragEvent) => {
@@ -252,7 +200,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     const card = e.currentTarget as HTMLElement;
     const nextTarget = e.relatedTarget as Node | null;
     if (nextTarget && card.contains(nextTarget)) return;
-    if (dragOverTargetRef.current?.slug === targetSlug) dragOverTargetRef.current = null;
     if (!useLargeBoardMode) {
       setDragOverTarget(current => current?.slug === targetSlug ? null : current);
     }
@@ -286,7 +233,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     setDragOverTarget(null);
     dragOverTargetRef.current = null;
     setDragOverColumnId(null);
-    removeDragPreview();
 
     try {
       await fetch(`/api/tasks/${draggedTaskSlug}`, {
@@ -308,11 +254,13 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       setDragOverTarget(null);
       dragOverTargetRef.current = null;
       setDragOverColumnId(null);
-      removeDragPreview();
       return;
     }
 
-    const position = dragOverTargetRef.current?.position || dragOverTarget?.position || 'above';
+    const position = (dragOverTargetRef.current?.slug === targetTask.slug)
+      ? dragOverTargetRef.current.position
+      : (dragOverTarget?.slug === targetTask.slug ? dragOverTarget.position : 'above');
+
     const draggedTask = tasks.find(t => t.slug === draggedTaskSlug);
     if (!draggedTask) return;
 
@@ -323,8 +271,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     else if (groupBy === 'priority') groupUpdates = { priority: targetTask.priority };
     else if (groupBy === 'assignee') groupUpdates = { assignee: targetTask.assignee };
 
-    // Calculate new order
-    const targetColTasks = tasks
+    // Get current tasks in target column sorted by order
+    const colTasks = tasks
       .filter(t => {
         if (groupBy === 'status') return t.status === targetTask.status;
         if (groupBy === 'project') return t.project === targetTask.project;
@@ -335,29 +283,28 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       .filter(t => t.slug !== draggedTaskSlug)
       .sort((a, b) => a.order - b.order);
 
-    const targetIdx = targetColTasks.findIndex(t => t.slug === targetTask.slug);
-    let newOrder = 100;
-
-    if (position === 'above') {
-      const prevTask = targetColTasks[targetIdx - 1];
-      if (!prevTask) {
-        newOrder = targetTask.order - 10;
-      } else {
-        newOrder = (prevTask.order + targetTask.order) / 2;
-      }
+    const targetIdx = colTasks.findIndex(t => t.slug === targetTask.slug);
+    if (targetIdx !== -1) {
+      const insertIdx = position === 'above' ? targetIdx : targetIdx + 1;
+      colTasks.splice(insertIdx, 0, { ...draggedTask, ...groupUpdates });
     } else {
-      const nextTask = targetColTasks[targetIdx + 1];
-      if (!nextTask) {
-        newOrder = targetTask.order + 10;
-      } else {
-        newOrder = (targetTask.order + nextTask.order) / 2;
-      }
+      colTasks.push({ ...draggedTask, ...groupUpdates });
     }
 
-    const updates = { ...groupUpdates, order: newOrder };
+    // Assign clean spaced order values (100, 200, 300...)
+    const orderMap = new Map<string, number>();
+    colTasks.forEach((t, idx) => {
+      orderMap.set(t.slug, (idx + 1) * 100);
+    });
 
     setTasks(prev => {
-      const updated = prev.map(t => t.slug === draggedTaskSlug ? { ...t, ...updates } : t);
+      const updated = prev.map(t => {
+        const newOrd = orderMap.get(t.slug);
+        if (newOrd !== undefined) {
+          return { ...t, ...(t.slug === draggedTaskSlug ? groupUpdates : {}), order: newOrd };
+        }
+        return t;
+      });
       return updated.sort((a, b) => a.order - b.order);
     });
 
@@ -365,18 +312,28 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     setDragOverTarget(null);
     dragOverTargetRef.current = null;
     setDragOverColumnId(null);
-    removeDragPreview();
 
     try {
-      await fetch(`/api/tasks/${draggedTaskSlug}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
+      // Save all updated task orders in the column
+      await Promise.all(
+        colTasks.map(t => {
+          const ord = orderMap.get(t.slug);
+          const bodyUpdates = t.slug === draggedTaskSlug
+            ? { ...groupUpdates, order: ord }
+            : { order: ord };
+
+          return fetch(`/api/tasks/${t.slug}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyUpdates),
+          });
+        })
+      );
     } catch (err) {
-      console.error('Failed to reorder task:', err);
+      console.error('Failed to reorder tasks:', err);
     }
   };
+
 
   const handleQuickAdd = async (columnValue: string) => {
     const title = quickTitle[columnValue]?.trim();
@@ -666,7 +623,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                       key={task.slug}
                       draggable
                       onDragStart={(e) => handleDragStart(task.slug, e)}
-                      onDrag={handleDrag}
                       onDragOver={(e) => handleDragOverCard(task.slug, col.id, e)}
                       onDragLeave={(e) => handleDragLeaveCard(task.slug, e)}
                       onDrop={(e) => handleDropOnCard(task, e)}
@@ -676,7 +632,6 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                         setDragOverTarget(null);
                         dragOverTargetRef.current = null;
                         setDragOverColumnId(null);
-                        removeDragPreview();
                       }}
                       class="sketch-card"
                       style={{

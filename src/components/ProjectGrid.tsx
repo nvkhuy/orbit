@@ -144,6 +144,7 @@ export default function ProjectGrid({ initialProjects }: ProjectGridProps) {
               <div class="project-grid__header">
                 <a
                   href={`/projects/${project.slug}`}
+                  draggable={false}
                   onClick={(event) => {
                     if (Date.now() - lastDragEndAt.current < 250) event.preventDefault();
                   }}

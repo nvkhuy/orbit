@@ -1,16 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Orbit">
-  <defs>
-    <linearGradient id="planet" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff59d"/>
-      <stop offset="1" stop-color="#8bc4d8"/>
-    </linearGradient>
-    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#d8b45a"/>
-      <stop offset="1" stop-color="#8c7441"/>
-    </linearGradient>
-  </defs>
-  <ellipse cx="32" cy="34" rx="25" ry="9" transform="rotate(25 32 34)" fill="none" stroke="url(#ring)" stroke-width="5"/>
-  <circle cx="32" cy="30" r="14" fill="url(#planet)" stroke="#2d2d2d" stroke-width="2"/>
-  <path d="M20 26c7 4 17 5 25 1M21 33c7 3 15 4 23 1" fill="none" stroke="#8ca48d" stroke-width="2" stroke-linecap="round" opacity=".75"/>
-  <path d="M10 22c3-3 6-4 9-4" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" role="img" aria-label="Orbit">
+  <!-- Back Ring Loop -->
+  <path d="M 6 22 C 3 15, 14 8, 27 9 C 34 10, 37 13, 37 16.5" stroke="#2d2d2d" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Planet Circle -->
+  <circle cx="20" cy="20" r="9.5" fill="#ffd54f" stroke="#2d2d2d" stroke-width="3.5"/>
+  <!-- Front Ring Loop -->
+  <path d="M 37 16.5 C 37 23.5, 26 31, 13 30 C 5 29.5, 3 26, 6 22" stroke="#2d2d2d" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Red Satellite Dot -->
+  <circle cx="33.5" cy="12.5" r="3.5" fill="#ff4d4d" stroke="#2d2d2d" stroke-width="2"/>
 </svg>

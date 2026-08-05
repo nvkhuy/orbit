@@ -1,13 +1,14 @@
 ---
 title: Polish edge cases — Design System
 project: design-system
-status: in-review
+status: todo
 priority: low
-assignee: mina
+assignee: ''
 tags:
+  - design
   - fixture
-due: '2026-08-87'
-order: 450
+due: '2026-10-03'
+order: 110
 parent: ''
 created: '2026-08-05'
 updated: '2026-08-05'

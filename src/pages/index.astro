@@ -2,6 +2,7 @@
 import BaseLayout from '../components/BaseLayout.astro';
 import Badge from '../components/Badge.astro';
 import ProjectGrid from '../components/ProjectGrid';
+import OrbitLogo from '../components/OrbitLogo.astro';
 import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const rawProjects = readProjectsFromDisk();
@@ -53,7 +54,10 @@ const dashboardProjects = projects.map(project => {
     {/* Hero Section */}
     <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 0.75rem;">
       <div>
-        <h1 style="font-size: 1.6rem; transform: rotate(-1deg);">🪐 Orbit Workspace</h1>
+        <h1 style="font-size: 1.6rem; transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 0.4rem;">
+          <OrbitLogo size={34} />
+          <span>Workspace</span>
+        </h1>
         <p style="font-size: 1.05rem; color: var(--fg); opacity: 0.85;">
           Where humans & AI agents revolve around one shared Markdown workspace.
         </p>

@@ -1,7 +1,6 @@
 ---
 title: Design System
 status: active
-priority: medium
 color: '#e1bee7'
 tags:
   - design
@@ -12,7 +11,8 @@ columns:
   - in-review
   - done
 owner: ''
+order: 900
 created: '2026-08-05'
-updated: '2026-08-05'
+updated: '2026-08-05T05:36:08.746Z'
 ---
-Shared visual language and components.
+Shared components, patterns, and visual language.

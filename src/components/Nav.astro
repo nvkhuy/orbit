@@ -1,23 +1,25 @@
 ---
 import OrbitLogo from './OrbitLogo.astro';
+import WorkspaceImportExport from './WorkspaceImportExport';
 const currentPath = Astro.url.pathname;
 ---
 
-<nav style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding: 0.25rem 0 1rem; margin-bottom: 1.25rem;">
+<nav style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding: 0.25rem 0 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
 	<div style="font-family: var(--font-heading); font-size: 2.1rem; transform: rotate(-2deg);">
 		<a href="/" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
 			<OrbitLogo size={38} />
 			<span>Orbit</span>
 		</a>
 	</div>
-	<ul style="list-style: none; display: flex; gap: 1.75rem; font-size: 1.3rem;">
+	<ul style="list-style: none; display: flex; gap: 1.75rem; font-size: 1.3rem; margin: 0; padding: 0;">
 		<li><a href="/" class={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Dashboard</a></li>
 		<li><a href="/board" class={`nav-link ${currentPath.startsWith('/board') ? 'active' : ''}`}>Board</a></li>
 		<li><a href="/list" class={`nav-link ${currentPath.startsWith('/list') ? 'active' : ''}`}>List</a></li>
 		<li><a href="/agents" class={`nav-link ${currentPath.startsWith('/agents') ? 'active' : ''}`}>Agents</a></li>
 	</ul>
-	<div>
-		<a href="/new?type=project" class="sketch-button" style="padding: 0.4rem 1.15rem; font-size: 1.1rem;"><span>+ New Project</span></a>
+	<div style="display: flex; align-items: center; gap: 0.6rem;">
+		<WorkspaceImportExport client:load />
+		<a href="/new?type=project" class="sketch-button" style="padding: 0.35rem 1rem; font-size: 0.95rem;"><span>+ New Project</span></a>
 	</div>
 </nav>
 

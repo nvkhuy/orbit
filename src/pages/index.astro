@@ -3,6 +3,7 @@ import BaseLayout from '../components/BaseLayout.astro';
 import Badge from '../components/Badge.astro';
 import ProjectGrid from '../components/ProjectGrid';
 import OrbitLogo from '../components/OrbitLogo.astro';
+import { SketchFolderIcon, SketchPinIcon } from '../components/SketchIcons';
 import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const rawProjects = readProjectsFromDisk();
@@ -62,7 +63,7 @@ const dashboardProjects = projects.map(project => {
           Where humans & AI agents revolve around one shared Markdown workspace.
         </p>
       </div>
-      <div style="display: flex; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <a href="/new?type=task" class="sketch-button" style="font-size: 0.95rem; padding: 0.35rem 1rem;">+ New Task</a>
         <a href="/board" class="sketch-button secondary" style="font-size: 0.95rem; padding: 0.35rem 1rem;">📋 View Board</a>
       </div>
@@ -91,7 +92,10 @@ const dashboardProjects = projects.map(project => {
     {/* Active Projects Cards */}
     <div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-        <h2 style="font-size: 1.6rem; transform: rotate(1deg);">📁 Active Projects</h2>
+        <h2 style="font-size: 1.6rem; transform: rotate(1deg); display: inline-flex; align-items: center; gap: 0.45rem;">
+          <SketchFolderIcon size={28} />
+          <span>Active Projects</span>
+        </h2>
         <a href="/new?type=project" style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--blue);">+ New Project</a>
       </div>
 
@@ -101,7 +105,10 @@ const dashboardProjects = projects.map(project => {
     {/* Recent Tasks */}
     <div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-        <h2 style="font-size: 1.6rem; transform: rotate(-1deg);">📌 Recent Tasks</h2>
+        <h2 style="font-size: 1.6rem; transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 0.45rem;">
+          <SketchPinIcon size={28} />
+          <span>Recent Tasks</span>
+        </h2>
         <a href="/list" style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--blue);">View All Tasks →</a>
       </div>
 

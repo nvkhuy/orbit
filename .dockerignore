@@ -5,4 +5,15 @@ dist
 .gitignore
 .idea
 .vscode
+.gemini
 *.log
+README.md
+AGENTS.md
+CLAUDE.md
+Dockerfile
+docker-compose.yml
+Makefile
+plan.md
+sketch_style.md
+cli
+scripts

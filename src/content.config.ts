@@ -6,9 +6,9 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     status: z.enum(['active', 'paused', 'archived', 'completed']),
-    priority: z.enum(['low', 'medium', 'high', 'critical']),
     tags: z.array(z.string()).optional(),
     color: z.string().optional(),
+    order: z.number().optional(),
     owner: z.string().optional(),
     created: z.union([z.date(), z.string()]),
     updated: z.union([z.date(), z.string()]),

@@ -175,7 +175,7 @@ The browser uses API routes for mutations, while the resulting Markdown files re
 | `npm run dev` | Start the local development server |
 | `npm run build` | Create a production build in `dist/` |
 | `npm run preview` | Preview the production build locally |
-| `make test` | Seed 8 projects and 80 tasks across every status |
+| `make test` | Seed 30 varied projects with 15–30 tasks each across every status and priority |
 | `make reset` | Remove all workspace Markdown content |
 
 Before opening a pull request, run:

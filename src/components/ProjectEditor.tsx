@@ -3,10 +3,12 @@ import type { Project } from './KanbanBoard';
 import SketchSelect from './SketchSelect';
 
 interface ProjectEditorProps {
-  initialProject: Project & { status: string; priority: string; body: string };
+  initialProject: Project & { status: string; body: string };
+  onProjectChange?: (project: ProjectEditorProps['initialProject']) => void;
+  onRequestDelete: () => void;
 }
 
-export default function ProjectEditor({ initialProject }: ProjectEditorProps) {
+export default function ProjectEditor({ initialProject, onProjectChange, onRequestDelete }: ProjectEditorProps) {
   const [project, setProject] = useState(initialProject);
   const [body, setBody] = useState(initialProject.body || '');
   const [isSaving, setIsSaving] = useState(false);
@@ -16,7 +18,9 @@ export default function ProjectEditor({ initialProject }: ProjectEditorProps) {
     setIsSaving(true);
     setMessage('');
 
-    setProject(prev => ({ ...prev, ...updates }));
+    const updatedProject = { ...project, ...updates };
+    setProject(updatedProject);
+    onProjectChange?.(updatedProject);
 
     try {
       const res = await fetch(`/api/projects/${project.slug}`, {
@@ -38,24 +42,11 @@ export default function ProjectEditor({ initialProject }: ProjectEditorProps) {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this project markdown file?')) return;
-    try {
-      await fetch(`/api/projects/${project.slug}`, { method: 'DELETE' });
-      window.location.href = '/';
-    } catch (err) {
-      alert('Failed to delete project.');
-    }
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <div class="sketch-card postit" data-decoration="tape">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <a href="/" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--fg)' }}>
-            ← Back to Dashboard
-          </a>
-          <button onClick={handleDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '1rem' }}>
+          <button onClick={onRequestDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)' }}>
             🗑️ Delete Project
           </button>
         </div>
@@ -85,21 +76,6 @@ export default function ProjectEditor({ initialProject }: ProjectEditorProps) {
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold' }}>Priority</label>
-            <SketchSelect
-              value={project.priority}
-              onChange={(value) => updateProject({ priority: value })}
-              options={[
-                { value: 'critical', label: 'critical' },
-                { value: 'high', label: 'high' },
-                { value: 'medium', label: 'medium' },
-                { value: 'low', label: 'low' },
-              ]}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div>
             <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold' }}>Color</label>
             <input
               type="color"
@@ -112,7 +88,7 @@ export default function ProjectEditor({ initialProject }: ProjectEditorProps) {
         </div>
       </div>
 
-      <div class="sketch-card" data-decoration="tack">
+      <div class="sketch-card" data-decoration="tape">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h2 style="font-size: 1.75rem;">Project Markdown Notes</h2>
           {message && <span style={{ fontFamily: 'var(--font-heading)', color: 'var(--blue)' }}>{message}</span>}

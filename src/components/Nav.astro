@@ -13,7 +13,7 @@ const currentPath = Astro.url.pathname;
 		<li><a href="/agents" class={`nav-link ${currentPath.startsWith('/agents') ? 'active' : ''}`}>Agents</a></li>
 	</ul>
 	<div>
-		<a href="/new" class="sketch-button" style="padding: 0.4rem 1.15rem; font-size: 1.1rem;"><span>+ New Task</span></a>
+		<a href="/new?type=project" class="sketch-button" style="padding: 0.4rem 1.15rem; font-size: 1.1rem;"><span>+ New Project</span></a>
 	</div>
 </nav>
 

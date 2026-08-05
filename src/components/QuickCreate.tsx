@@ -4,10 +4,11 @@ import SketchSelect from './SketchSelect';
 
 interface QuickCreateProps {
   projects: Project[];
+  initialMode?: 'task' | 'project';
 }
 
-export default function QuickCreate({ projects }: QuickCreateProps) {
-  const [mode, setMode] = useState<'task' | 'project'>('task');
+export default function QuickCreate({ projects, initialMode = 'task' }: QuickCreateProps) {
+  const [mode, setMode] = useState<'task' | 'project'>(initialMode);
 
   // Task form state
   const [taskTitle, setTaskTitle] = useState('');
@@ -19,7 +20,6 @@ export default function QuickCreate({ projects }: QuickCreateProps) {
 
   // Project form state
   const [projTitle, setProjTitle] = useState('');
-  const [projPriority, setProjPriority] = useState('medium');
   const [projColor, setProjColor] = useState('#fff9c4');
   const [projContent, setProjContent] = useState('');
 
@@ -90,7 +90,6 @@ export default function QuickCreate({ projects }: QuickCreateProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: projTitle,
-          priority: projPriority,
           color: projColor,
           content: projContent,
         }),
@@ -221,7 +220,7 @@ export default function QuickCreate({ projects }: QuickCreateProps) {
         </form>
       ) : (
         /* Project Creation Form */
-        <form onSubmit={handleCreateProject} class="sketch-card" data-decoration="tack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleCreateProject} class="sketch-card" data-decoration="tape" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem; text-align: center;">New Project Folder</h2>
 
           <div>
@@ -236,27 +235,15 @@ export default function QuickCreate({ projects }: QuickCreateProps) {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-            <div>
-              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Priority</label>
-              <SketchSelect
-                value={projPriority}
-                options={priorityOptions}
-                onChange={(val) => setProjPriority(val)}
-                style={{ width: '100%' }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Post-it Color</label>
-              <input
-                type="color"
-                value={projColor}
-                onInput={(e: any) => setProjColor(e.target.value)}
-                class="sketch-input"
-                style={{ height: '38px', padding: '0.1rem 0.2rem' }}
-              />
-            </div>
+          <div>
+            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Post-it Color</label>
+            <input
+              type="color"
+              value={projColor}
+              onInput={(e: any) => setProjColor(e.target.value)}
+              class="sketch-input"
+              style={{ height: '38px', padding: '0.1rem 0.2rem' }}
+            />
           </div>
 
           <div>

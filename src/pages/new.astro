@@ -9,11 +9,12 @@ const projects = rawProjects.map(p => ({
   title: p.data.title,
   color: p.data.color,
 }));
+const initialMode = Astro.url.searchParams.get('type') === 'project' ? 'project' : 'task';
 ---
 
 <BaseLayout title="Orbit - Quick Create">
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
     <h1 style="font-size: 3rem; text-align: center; transform: rotate(-1deg);">✨ Quick Create</h1>
-    <QuickCreate client:load projects={projects} />
+    <QuickCreate client:load projects={projects} initialMode={initialMode} />
   </div>
 </BaseLayout>

@@ -29,6 +29,7 @@ interface KanbanBoardProps {
 }
 
 const DEFAULT_COLUMNS = ['todo', 'in-progress', 'in-review', 'done'];
+const DRAGGED_TASK_SCALE = 0.9;
 
 export default function KanbanBoard({ initialTasks, projects, initialProjectFilter = '' }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -41,6 +42,9 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
   const [draggedTaskSlug, setDraggedTaskSlug] = useState<string | null>(null);
   const [dragOverTarget, setDragOverTarget] = useState<{ slug: string; position: 'above' | 'below' } | null>(null);
+  const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
+  const dragPreviewRef = useRef<HTMLElement | null>(null);
+  const dragPointerOffsetRef = useRef({ x: 0, y: 0 });
   const lastDragEndAt = useRef(0);
   
   const [quickTitle, setQuickTitle] = useState<{ [col: string]: string }>({});
@@ -51,6 +55,11 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
   const [isSavingModal, setIsSavingModal] = useState<boolean>(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
+  const removeDragPreview = () => {
+    dragPreviewRef.current?.remove();
+    dragPreviewRef.current = null;
+  };
+
   // The dev server intentionally ignores Markdown task writes to avoid a
   // full refresh during drag/drop. Read the persisted files once on mount so
   // a browser refresh still reflects the latest disk state.
@@ -60,6 +69,34 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       .then((freshTasks: Task[]) => setTasks(freshTasks))
       .catch(err => console.error('Failed to load persisted tasks:', err));
   }, []);
+
+  // Keep other dashboard islands, such as the project progress overview,
+  // synchronized with every optimistic board change.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('orbit:tasks-updated', {
+      detail: { tasks },
+    }));
+  }, [tasks]);
+
+  useEffect(() => {
+    if (!activeTask && !taskToDelete) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+
+      if (taskToDelete) {
+        setTaskToDelete(null);
+      } else {
+        setActiveTask(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [Boolean(activeTask), Boolean(taskToDelete)]);
+
+  useEffect(() => removeDragPreview, []);
 
   // Filter tasks
   const filteredTasks = tasks.filter(task => {
@@ -115,23 +152,75 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
   // Handle Drag & Drop
   const handleDragStart = (slug: string, e: DragEvent) => {
+    const sourceCard = e.currentTarget as HTMLElement;
+    const sourceRect = sourceCard.getBoundingClientRect();
+    const dragPreview = sourceCard.cloneNode(true) as HTMLElement;
+
+    dragPointerOffsetRef.current = {
+      x: e.clientX - sourceRect.left,
+      y: e.clientY - sourceRect.top,
+    };
+
+    Object.assign(dragPreview.style, {
+      position: 'fixed',
+      left: `${sourceRect.left}px`,
+      top: `${sourceRect.top}px`,
+      width: `${sourceRect.width}px`,
+      height: `${sourceRect.height}px`,
+      margin: '0',
+      pointerEvents: 'none',
+      zIndex: '10001',
+      opacity: '0.92',
+      transform: `scale(${DRAGGED_TASK_SCALE})`,
+      transformOrigin: 'top left',
+      transition: 'none',
+    });
+
+    removeDragPreview();
+    document.body.appendChild(dragPreview);
+    dragPreviewRef.current = dragPreview;
+
     setDraggedTaskSlug(slug);
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', slug);
+
+      // Hide the browser-generated full-size ghost; the controlled preview
+      // above follows the pointer and preserves the intended scale.
+      const transparentDragImage = document.createElement('canvas');
+      transparentDragImage.width = 1;
+      transparentDragImage.height = 1;
+      e.dataTransfer.setDragImage(transparentDragImage, 0, 0);
     }
   };
 
-  const handleDragOverColumn = (e: DragEvent) => {
+  const handleDrag = (e: DragEvent) => {
+    if (!dragPreviewRef.current || (e.clientX === 0 && e.clientY === 0)) return;
+
+    const { x, y } = dragPointerOffsetRef.current;
+    dragPreviewRef.current.style.left = `${e.clientX - (x * DRAGGED_TASK_SCALE)}px`;
+    dragPreviewRef.current.style.top = `${e.clientY - (y * DRAGGED_TASK_SCALE)}px`;
+  };
+
+  const handleDragOverColumn = (columnId: string, e: DragEvent) => {
     e.preventDefault();
+    setDragOverColumnId(columnId);
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'move';
     }
   };
 
-  const handleDragOverCard = (targetSlug: string, e: DragEvent) => {
+  const handleDragLeaveColumn = (columnId: string, e: DragEvent) => {
+    const column = e.currentTarget as HTMLElement;
+    const nextTarget = e.relatedTarget as Node | null;
+    if (nextTarget && column.contains(nextTarget)) return;
+    if (dragOverColumnId === columnId) setDragOverColumnId(null);
+  };
+
+  const handleDragOverCard = (targetSlug: string, columnId: string, e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setDragOverColumnId(columnId);
     if (targetSlug === draggedTaskSlug) {
       setDragOverTarget(null);
       return;
@@ -174,6 +263,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     setTasks(prev => prev.map(t => t.slug === draggedTaskSlug ? { ...t, ...updates } : t));
     setDraggedTaskSlug(null);
     setDragOverTarget(null);
+    setDragOverColumnId(null);
+    removeDragPreview();
 
     try {
       await fetch(`/api/tasks/${draggedTaskSlug}`, {
@@ -193,6 +284,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     if (!draggedTaskSlug || draggedTaskSlug === targetTask.slug) {
       setDraggedTaskSlug(null);
       setDragOverTarget(null);
+      setDragOverColumnId(null);
+      removeDragPreview();
       return;
     }
 
@@ -247,6 +340,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
     setDraggedTaskSlug(null);
     setDragOverTarget(null);
+    setDragOverColumnId(null);
+    removeDragPreview();
 
     try {
       await fetch(`/api/tasks/${draggedTaskSlug}`, {
@@ -381,6 +476,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     columns = assignees.map(a => ({ id: a, label: a || 'Unassigned' }));
   }
 
+  const useScrollableColumns = columns.length > 6;
+
   const getPriorityColor = (p: string) => {
     switch (p) {
       case 'critical': return '#ff8a80';
@@ -456,8 +553,25 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       </div>
 
       {/* Board Columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, gap: '1rem', paddingBottom: '0.5rem', alignItems: 'stretch' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: useScrollableColumns
+            ? `repeat(${columns.length}, minmax(280px, 320px))`
+            : `repeat(${columns.length}, minmax(0, 1fr))`,
+          gap: '1rem',
+          width: '100%',
+          maxWidth: '100%',
+          overflowX: useScrollableColumns ? 'auto' : 'visible',
+          overflowY: 'visible',
+          padding: useScrollableColumns ? '0.35rem 0.35rem 1rem' : '0 0 0.5rem',
+          alignItems: 'stretch',
+          scrollSnapType: useScrollableColumns ? 'x proximity' : undefined,
+          scrollbarWidth: 'thin',
+        }}
+      >
         {columns.map((col) => {
+          const isDragOverColumn = dragOverColumnId === col.id && draggedTaskSlug !== null;
           const groupTasks = filteredTasks.filter(t => {
             if (groupBy === 'status') return t.status === col.id;
             if (groupBy === 'project') return t.project === col.id;
@@ -475,15 +589,20 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                 // shape. Keeping the frame aligned to its grid cell prevents
                 // badges and cards from overlapping adjacent columns when the
                 // board contains many tasks.
-                transform: 'none',
-                backgroundColor: col.color || 'transparent',
+                transform: isDragOverColumn ? 'scale(1.05)' : 'scale(1)',
+                transformOrigin: 'center',
+                backgroundColor: isDragOverColumn ? 'rgba(45, 93, 161, 0.08)' : (col.color || 'transparent'),
                 minHeight: '350px',
                 minWidth: 0,
                 isolation: 'isolate',
+                zIndex: isDragOverColumn ? 20 : 1,
                 padding: '0.6rem',
-                transition: 'background-color 0.2s ease',
+                scrollSnapAlign: useScrollableColumns ? 'start' : undefined,
+                boxShadow: isDragOverColumn ? '0 0 0 4px var(--blue), var(--shadow)' : 'none',
+                transition: 'transform 0.18s ease, background-color 0.2s ease, box-shadow 0.18s ease',
               }}
-              onDragOver={handleDragOverColumn}
+              onDragOver={(e) => handleDragOverColumn(col.id, e)}
+              onDragLeave={(e) => handleDragLeaveColumn(col.id, e)}
               onDrop={(e) => handleDropOnColumn(col.id, e)}
             >
               <div class="kanban-column-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.1rem' }}>
@@ -506,13 +625,16 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                       key={task.slug}
                       draggable
                       onDragStart={(e) => handleDragStart(task.slug, e)}
-                      onDragOver={(e) => handleDragOverCard(task.slug, e)}
+                      onDrag={handleDrag}
+                      onDragOver={(e) => handleDragOverCard(task.slug, col.id, e)}
                       onDragLeave={handleDragLeaveCard}
                       onDrop={(e) => handleDropOnCard(task, e)}
                       onDragEnd={() => {
                         lastDragEndAt.current = Date.now();
                         setDraggedTaskSlug(null);
                         setDragOverTarget(null);
+                        setDragOverColumnId(null);
+                        removeDragPreview();
                       }}
                       class="sketch-card"
                       style={{
@@ -520,7 +642,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                         width: '100%',
                         minWidth: 0,
                         overflow: 'hidden',
-                        transform: isBeingDragged ? 'scale(0.96)' : `rotate(${cardRot})`,
+                        transform: isBeingDragged ? `scale(${DRAGGED_TASK_SCALE})` : `rotate(${cardRot})`,
+                        transformOrigin: 'center',
                         backgroundColor: task.status === 'done' ? '#f5f5f5' : '#ffffff',
                         opacity: isBeingDragged ? 0.4 : (task.status === 'done' ? 0.75 : 1),
                         padding: '0.75rem 0.9rem',

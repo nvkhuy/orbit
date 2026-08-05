@@ -116,6 +116,227 @@
   box-shadow: 0 0 0 2px rgba(45, 93, 161, 0.2);
 }
 
+/* Project detail overview */
+.project-overview {
+  padding: 0.9rem 1.25rem 1rem;
+  cursor: pointer;
+}
+
+.project-overview:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 4px;
+}
+
+.project-overview__topline,
+.project-overview__main,
+.project-overview__progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-overview__topline {
+  margin-bottom: 0.4rem;
+}
+
+.project-overview__back {
+  color: var(--blue);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+}
+
+.project-overview__main {
+  align-items: flex-end;
+}
+
+.project-overview__identity h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.project-overview__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+}
+
+.project-overview__badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.05rem 0.55rem;
+}
+
+.project-overview__percentage {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.project-overview__percentage strong {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.project-overview__progress-label {
+  margin: 0.55rem 0 0.2rem;
+  font-size: 0.9rem;
+}
+
+.project-overview__progress-track {
+  height: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 2px;
+}
+
+.project-overview__progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.project-details-dialog {
+  width: min(1000px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  padding: 1rem;
+  overflow-y: auto;
+  color: var(--fg);
+  background: var(--bg);
+  background-image: var(--paper-dots);
+  background-size: var(--paper-dots-size);
+  border: 3px solid var(--border);
+  border-radius: var(--radius-wobbly-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.project-details-dialog::backdrop {
+  background: rgba(45, 45, 45, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.project-details-dialog__header {
+  position: sticky;
+  top: -1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: -1rem -1rem 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg);
+  border-bottom: 2px dashed var(--border);
+}
+
+.project-details-dialog__header h2 {
+  font-size: 1.8rem;
+}
+
+.project-details-dialog__eyebrow {
+  color: var(--blue);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 640px) {
+  .project-overview__main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .project-overview__topline .sketch-button {
+    padding-inline: 0.7rem;
+  }
+
+  .project-overview__percentage strong {
+    font-size: 2rem;
+  }
+}
+
+/* Draggable project cards */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.project-grid__card {
+  min-width: 0;
+  padding: 0.85rem 1.1rem;
+  cursor: grab;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.project-grid__card:active {
+  cursor: grabbing;
+}
+
+.project-grid__header,
+.project-grid__progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.project-grid__header a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--fg);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+
+.project-grid__status {
+  flex: none;
+  padding: 0.2rem 0.65rem;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-wobbly-sm);
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+.project-grid__progress {
+  margin-top: 0.75rem;
+}
+
+.project-grid__progress-label {
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.project-grid__progress-track {
+  height: 12px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.project-grid__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.project-grid__tags span {
+  padding: 0.05rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
 /* Kanban column */
 .kanban-column {
   border: 2px dashed var(--border);

@@ -12,9 +12,9 @@ export const POST: APIRoute = async ({ request }) => {
     const frontmatter = {
       title: data.title,
       status: data.status || 'active',
-      priority: data.priority || 'medium',
       tags: data.tags || [],
       color: data.color || '#fff9c4',
+      order: data.order ?? Date.now(),
       owner: data.owner || '',
       created: new Date().toISOString(),
       updated: new Date().toISOString(),

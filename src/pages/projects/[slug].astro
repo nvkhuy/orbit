@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../components/BaseLayout.astro';
-import ProjectEditor from '../../components/ProjectEditor';
+import ProjectOverview from '../../components/ProjectOverview';
 import KanbanBoard from '../../components/KanbanBoard';
 import { readProjectFromDisk, readProjectsFromDisk, readTasksFromDisk } from '../../lib/content';
 
@@ -37,7 +37,6 @@ const initialProject = {
   slug: projectEntry.id.replace(/\.md$/, ''),
   title: projectEntry.data.title,
   status: projectEntry.data.status,
-  priority: projectEntry.data.priority,
   columns: projectEntry.data.columns,
   color: projectEntry.data.color,
   body: projectEntry.body || '',
@@ -50,26 +49,18 @@ const progressPct = projectTasks.length > 0 ? Math.round((doneCount / projectTas
 ---
 
 <BaseLayout title={`Project - ${initialProject.title}`}>
-  <div style="display: flex; flex-direction: column; gap: 2rem;">
-    {/* Project Header Card */}
-    <ProjectEditor client:load initialProject={initialProject} />
-
-    {/* Hand-Drawn Progress Bar */}
-    <div class="sketch-card" style="padding: 1.25rem;">
-      <div style="display: flex; justify-content: space-between; font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 0.5rem;">
-        <span>Project Progress</span>
-        <span>{doneCount} / {projectTasks.length} Done ({progressPct}%)</span>
-      </div>
-      <div class="wobbly-border-sm" style="height: 24px; background-color: var(--muted); overflow: hidden; padding: 2px;">
-        <div 
-          style={`height: 100%; width: ${progressPct}%; background-color: var(--accent); border-radius: 4px; transition: width 0.3s ease;`}
-        />
-      </div>
-    </div>
+  <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <ProjectOverview
+      client:load
+      initialProject={initialProject}
+      doneCount={doneCount}
+      totalTasks={projectTasks.length}
+      progressPct={progressPct}
+    />
 
     {/* Filtered Project Kanban Board */}
     <div>
-      <h2 style="font-size: 2.25rem; margin-bottom: 1rem; transform: rotate(-1deg);">Project Board</h2>
+      <h2 style="font-size: 2rem; margin-bottom: 0.65rem; transform: rotate(-1deg);">Project Board</h2>
       <KanbanBoard client:load initialTasks={tasks} projects={projects} initialProjectFilter={initialProject.slug} />
     </div>
   </div>

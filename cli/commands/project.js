@@ -12,7 +12,6 @@ export function registerProjectCommands(program) {
     .description('Create a new project markdown file')
     .requiredOption('-t, --title <title>', 'Project title')
     .option('-s, --status <status>', 'Status', 'active')
-    .option('-p, --priority <priority>', 'Priority', 'medium')
     .action((options) => {
       const slug = options.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const filePath = path.join(projectsDir, `${slug}.md`);
@@ -20,8 +19,8 @@ export function registerProjectCommands(program) {
       const frontmatter = {
         title: options.title,
         status: options.status,
-        priority: options.priority,
         color: '#fff9c4',
+        order: Date.now(),
         created: new Date().toISOString().split('T')[0],
         updated: new Date().toISOString().split('T')[0],
         columns: ['todo', 'in-progress', 'in-review', 'done'],
@@ -52,7 +51,6 @@ export function registerProjectCommands(program) {
         Slug: p.slug,
         Title: p.title,
         Status: p.status,
-        Priority: p.priority,
       })));
     });
 }

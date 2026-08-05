@@ -7,6 +7,9 @@ import node from '@astrojs/node';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  security: {
+    checkOrigin: false,
+  },
   integrations: [preact()],
 
   // Workspace mutations are persisted by the API while interactive views

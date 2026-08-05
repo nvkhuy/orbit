@@ -7,6 +7,42 @@ interface QuickCreateProps {
   initialMode?: 'task' | 'project';
 }
 
+function hslToHex(hue: number, saturation: number, lightness: number) {
+  const saturationRatio = saturation / 100;
+  const lightnessRatio = lightness / 100;
+  const chroma = saturationRatio * Math.min(lightnessRatio, 1 - lightnessRatio);
+  const channel = (offset: number) => {
+    const segment = (offset + hue / 30) % 12;
+    const value = lightnessRatio - chroma * Math.max(-1, Math.min(segment - 3, 9 - segment, 1));
+    return Math.round(255 * value).toString(16).padStart(2, '0');
+  };
+
+  return `#${channel(0)}${channel(8)}${channel(4)}`;
+}
+
+function createUniqueSketchColor(excludedColors: string[]) {
+  const excluded = new Set(excludedColors.map(color => color.toLowerCase()));
+
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = 55 + Math.floor(Math.random() * 21);
+    const lightness = 82 + Math.floor(Math.random() * 9);
+    const color = hslToHex(hue, saturation, lightness);
+    if (!excluded.has(color)) return color;
+  }
+
+  for (const saturation of [60, 65, 70, 75, 55]) {
+    for (const lightness of [84, 87, 90, 82]) {
+      for (let hue = 0; hue < 360; hue += 1) {
+        const color = hslToHex(hue, saturation, lightness);
+        if (!excluded.has(color)) return color;
+      }
+    }
+  }
+
+  return '#fff9c4';
+}
+
 export default function QuickCreate({ projects, initialMode = 'task' }: QuickCreateProps) {
   const [mode, setMode] = useState<'task' | 'project'>(initialMode);
 
@@ -21,6 +57,7 @@ export default function QuickCreate({ projects, initialMode = 'task' }: QuickCre
   // Project form state
   const [projTitle, setProjTitle] = useState('');
   const [projColor, setProjColor] = useState('#fff9c4');
+  const [colorRefreshKey, setColorRefreshKey] = useState(0);
   const [projContent, setProjContent] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -237,13 +274,37 @@ export default function QuickCreate({ projects, initialMode = 'task' }: QuickCre
 
           <div>
             <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '0.2rem' }}>Post-it Color</label>
-            <input
-              type="color"
-              value={projColor}
-              onInput={(e: any) => setProjColor(e.target.value)}
-              class="sketch-input"
-              style={{ height: '38px', padding: '0.1rem 0.2rem' }}
-            />
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 44px', alignItems: 'start', gap: '0.75rem' }}>
+              <input
+                type="color"
+                value={projColor}
+                onInput={(e: any) => setProjColor(e.target.value)}
+                class="sketch-input"
+                style={{ width: '100%', height: '44px', padding: '0.1rem 0.2rem', boxShadow: '3px 3px 0 var(--border)' }}
+              />
+              <button
+                type="button"
+                class="sketch-button secondary"
+                onClick={() => {
+                  setProjColor(createUniqueSketchColor([
+                    ...projects.map(project => project.color || ''),
+                    projColor,
+                  ]));
+                  setColorRefreshKey(key => key + 1);
+                }}
+                style={{ width: '44px', height: '44px', padding: 0, fontSize: '2.2rem', lineHeight: 1 }}
+                aria-label="Pick a new unique pastel color"
+                title="Pick a new unique pastel color"
+              >
+                <span
+                  key={colorRefreshKey}
+                  class={colorRefreshKey > 0 ? 'color-refresh-icon is-spinning' : 'color-refresh-icon'}
+                  aria-hidden="true"
+                >
+                  ↻
+                </span>
+              </button>
+            </div>
           </div>
 
           <div>

@@ -337,6 +337,33 @@
   font-size: 0.75rem;
 }
 
+.color-refresh-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  transform-origin: 50% 50%;
+}
+
+.color-refresh-icon.is-spinning {
+  animation: color-refresh-spin 280ms ease-out;
+}
+
+@keyframes color-refresh-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .color-refresh-icon.is-spinning {
+    animation: none;
+  }
+}
+
 /* Kanban column */
 .kanban-column {
   border: 2px dashed var(--border);

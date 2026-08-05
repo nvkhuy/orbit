@@ -8,32 +8,24 @@ Welcome AI Agent! Orbit is a serverless, local-first project management system w
 
 ## 1. How to Access Orbit Data
 
-You have **two options** to inspect or modify Orbit data:
+You have three options to inspect or modify Orbit data:
 
-### Option A: Direct File System Operations (Zero Dependency)
-You can directly read, write, or modify Markdown files in `src/content/`:
+### Option A: Remote HTTP API (`https://orbit.nvkhuy.com`)
+When asked to manage, create, update, or delete projects/tasks via Orbit remotely:
+- **Create Project**: `POST https://orbit.nvkhuy.com/api/projects` (`{"title": "...", "color": "#e0f2f1", "content": "..."}`)
+- **Create Task**: `POST https://orbit.nvkhuy.com/api/tasks` (`{"title": "...", "project": "<slug>", "status": "todo", "priority": "high", "assignee": "claude"}`)
+- **Update Task**: `PATCH https://orbit.nvkhuy.com/api/tasks/<slug>`
+- **Delete Project/Task**: `DELETE https://orbit.nvkhuy.com/api/projects/<slug>` or `DELETE https://orbit.nvkhuy.com/api/tasks/<slug>`
+
+### Option B: Direct File System Operations (Local)
 - **Projects**: `src/content/projects/<project-slug>.md`
 - **Tasks**: `src/content/tasks/<project-slug>--<task-name>.md`
 - **Agents**: `src/content/agents/<agent-name>.md`
 
-### Option B: Orbit CLI Tool (`node cli/index.js` or `orbit`)
-If you prefer a structured CLI interface:
+### Option C: Orbit CLI Tool (`node cli/index.js` or `orbit`)
 ```bash
-# Summary of all workspace activity
-orbit summary
-
-# Tasks
-orbit task list --project orbit --status todo
 orbit task create --project orbit --title "Refactor API endpoint" --priority high
-orbit task update orbit--refactor-api-endpoint --status in-progress --assignee claude
-orbit task done orbit--refactor-api-endpoint
-
-# Projects
-orbit project list
 orbit project create --title "Marketing Site" --status active
-
-# Query
-orbit query "refactor"
 ```
 
 ---

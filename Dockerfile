@@ -9,6 +9,7 @@ RUN npm install
 COPY astro.config.mjs tsconfig.json ./
 COPY public ./public
 COPY src ./src
+RUN mkdir -p /app/src/content
 
 RUN npm run build
 

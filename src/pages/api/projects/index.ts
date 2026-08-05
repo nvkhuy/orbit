@@ -32,8 +32,9 @@ export const POST: APIRoute = async ({ request }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to create project' }), {
+  } catch (error: any) {
+    console.error('[API] Failed to create project:', error);
+    return new Response(JSON.stringify({ error: 'Failed to create project', details: error?.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

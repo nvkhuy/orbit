@@ -7,6 +7,11 @@ type ContentDirectory = 'projects' | 'tasks' | 'agents';
 function readCollectionFromDisk(directory: ContentDirectory) {
   const collectionDir = path.join(process.cwd(), 'src', 'content', directory);
 
+  if (!fs.existsSync(collectionDir)) {
+    fs.mkdirSync(collectionDir, { recursive: true });
+    return [];
+  }
+
   return fs.readdirSync(collectionDir)
     .filter(file => file.endsWith('.md'))
     .map(file => {

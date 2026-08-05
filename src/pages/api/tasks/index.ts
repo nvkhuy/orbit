@@ -70,8 +70,9 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'application/json'
       }
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to create task' }), {
+  } catch (error: any) {
+    console.error('[API] Failed to create task:', error);
+    return new Response(JSON.stringify({ error: 'Failed to create task', details: error?.message }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json'

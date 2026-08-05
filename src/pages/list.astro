@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import TaskListView from '../components/TaskListView';
-import { readTasksFromDisk } from '../lib/content';
-import { getCollection } from 'astro:content';
+import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
-const rawProjects = await getCollection('projects');
+const rawProjects = readProjectsFromDisk();
 const rawTasks = readTasksFromDisk();
 
 const projects = rawProjects.map(p => ({

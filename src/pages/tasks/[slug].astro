@@ -1,15 +1,15 @@
 ---
 import BaseLayout from '../../components/BaseLayout.astro';
 import TaskEditor from '../../components/TaskEditor';
-import { getCollection, getEntry } from 'astro:content';
+import { readProjectsFromDisk, readTaskFromDisk } from '../../lib/content';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/board');
 
-const taskEntry = await getEntry('tasks', slug);
+const taskEntry = readTaskFromDisk(slug);
 if (!taskEntry) return Astro.redirect('/board');
 
-const rawProjects = await getCollection('projects');
+const rawProjects = readProjectsFromDisk();
 const projects = rawProjects.map(p => ({
   slug: p.id.replace(/\.md$/, ''),
   title: p.data.title,

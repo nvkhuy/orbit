@@ -1,12 +1,11 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import KanbanBoard from '../components/KanbanBoard';
-import { readTasksFromDisk } from '../lib/content';
-import { getCollection } from 'astro:content';
+import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const projectFilter = Astro.url.searchParams.get('project') || '';
 
-const rawProjects = await getCollection('projects');
+const rawProjects = readProjectsFromDisk();
 const rawTasks = readTasksFromDisk();
 
 const projects = rawProjects.map(p => ({

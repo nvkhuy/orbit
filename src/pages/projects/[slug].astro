@@ -2,16 +2,15 @@
 import BaseLayout from '../../components/BaseLayout.astro';
 import ProjectEditor from '../../components/ProjectEditor';
 import KanbanBoard from '../../components/KanbanBoard';
-import { readTasksFromDisk } from '../../lib/content';
-import { getCollection, getEntry } from 'astro:content';
+import { readProjectFromDisk, readProjectsFromDisk, readTasksFromDisk } from '../../lib/content';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/');
 
-const projectEntry = await getEntry('projects', slug);
+const projectEntry = readProjectFromDisk(slug);
 if (!projectEntry) return Astro.redirect('/');
 
-const rawProjects = await getCollection('projects');
+const rawProjects = readProjectsFromDisk();
 const rawTasks = readTasksFromDisk();
 
 const projects = rawProjects.map(p => ({

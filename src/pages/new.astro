@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import QuickCreate from '../components/QuickCreate';
-import { getCollection } from 'astro:content';
+import { readProjectsFromDisk } from '../lib/content';
 
-const rawProjects = await getCollection('projects');
+const rawProjects = readProjectsFromDisk();
 const projects = rawProjects.map(p => ({
   slug: p.id.replace(/\.md$/, ''),
   title: p.data.title,

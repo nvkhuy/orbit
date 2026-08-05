@@ -2,9 +2,9 @@
 import BaseLayout from '../components/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import Badge from '../components/Badge.astro';
-import { getCollection } from 'astro:content';
+import { readAgentsFromDisk } from '../lib/content';
 
-const agents = await getCollection('agents');
+const agents = readAgentsFromDisk();
 ---
 
 <BaseLayout title="Orbit - Agent Hub">

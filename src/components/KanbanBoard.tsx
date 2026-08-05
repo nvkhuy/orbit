@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import SketchSelect from './SketchSelect';
 
 export interface Task {
@@ -42,6 +42,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
   const [draggedTaskSlug, setDraggedTaskSlug] = useState<string | null>(null);
   const [dragOverTarget, setDragOverTarget] = useState<{ slug: string; position: 'above' | 'below' } | null>(null);
+  const dragOverTargetRef = useRef<{ slug: string; position: 'above' | 'below' } | null>(null);
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
   const dragPreviewRef = useRef<HTMLElement | null>(null);
   const dragPointerOffsetRef = useRef({ x: 0, y: 0 });
@@ -99,7 +100,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
   useEffect(() => removeDragPreview, []);
 
   // Filter tasks
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = useMemo(() => tasks.filter(task => {
     if (projectFilter && task.project !== projectFilter) return false;
     if (assigneeFilter && task.assignee !== assigneeFilter) return false;
     if (priorityFilter && task.priority !== priorityFilter) return false;
@@ -111,7 +112,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       if (!matchTitle && !matchTag) return false;
     }
     return true;
-  });
+  }), [tasks, projectFilter, assigneeFilter, priorityFilter, hideDone, searchQuery]);
 
   // Options arrays for SketchSelect
   const projectOptions = [
@@ -177,6 +178,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     });
 
     removeDragPreview();
+    dragOverTargetRef.current = null;
     document.body.appendChild(dragPreview);
     dragPreviewRef.current = dragPreview;
 
@@ -204,7 +206,11 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
   const handleDragOverColumn = (columnId: string, e: DragEvent) => {
     e.preventDefault();
-    setDragOverColumnId(columnId);
+    setDragOverColumnId(current => current === columnId ? current : columnId);
+    if (dragOverTargetRef.current) {
+      dragOverTargetRef.current = null;
+      if (!useLargeBoardMode) setDragOverTarget(null);
+    }
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'move';
     }
@@ -214,15 +220,16 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     const column = e.currentTarget as HTMLElement;
     const nextTarget = e.relatedTarget as Node | null;
     if (nextTarget && column.contains(nextTarget)) return;
-    if (dragOverColumnId === columnId) setDragOverColumnId(null);
+    setDragOverColumnId(current => current === columnId ? null : current);
   };
 
   const handleDragOverCard = (targetSlug: string, columnId: string, e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOverColumnId(columnId);
+    setDragOverColumnId(current => current === columnId ? current : columnId);
     if (targetSlug === draggedTaskSlug) {
-      setDragOverTarget(null);
+      dragOverTargetRef.current = null;
+      if (!useLargeBoardMode) setDragOverTarget(null);
       return;
     }
 
@@ -230,11 +237,25 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     const midY = rect.top + rect.height / 2;
     const position: 'above' | 'below' = e.clientY < midY ? 'above' : 'below';
 
-    setDragOverTarget({ slug: targetSlug, position });
+    const nextTarget = { slug: targetSlug, position };
+    dragOverTargetRef.current = nextTarget;
+    if (!useLargeBoardMode) {
+      setDragOverTarget(current => (
+        current?.slug === targetSlug && current.position === position
+          ? current
+          : nextTarget
+      ));
+    }
   };
 
-  const handleDragLeaveCard = () => {
-    setDragOverTarget(null);
+  const handleDragLeaveCard = (targetSlug: string, e: DragEvent) => {
+    const card = e.currentTarget as HTMLElement;
+    const nextTarget = e.relatedTarget as Node | null;
+    if (nextTarget && card.contains(nextTarget)) return;
+    if (dragOverTargetRef.current?.slug === targetSlug) dragOverTargetRef.current = null;
+    if (!useLargeBoardMode) {
+      setDragOverTarget(current => current?.slug === targetSlug ? null : current);
+    }
   };
 
   const handleDropOnColumn = async (targetGroupValue: string, e: DragEvent) => {
@@ -263,6 +284,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     setTasks(prev => prev.map(t => t.slug === draggedTaskSlug ? { ...t, ...updates } : t));
     setDraggedTaskSlug(null);
     setDragOverTarget(null);
+    dragOverTargetRef.current = null;
     setDragOverColumnId(null);
     removeDragPreview();
 
@@ -284,12 +306,13 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     if (!draggedTaskSlug || draggedTaskSlug === targetTask.slug) {
       setDraggedTaskSlug(null);
       setDragOverTarget(null);
+      dragOverTargetRef.current = null;
       setDragOverColumnId(null);
       removeDragPreview();
       return;
     }
 
-    const position = dragOverTarget?.position || 'above';
+    const position = dragOverTargetRef.current?.position || dragOverTarget?.position || 'above';
     const draggedTask = tasks.find(t => t.slug === draggedTaskSlug);
     if (!draggedTask) return;
 
@@ -340,6 +363,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
 
     setDraggedTaskSlug(null);
     setDragOverTarget(null);
+    dragOverTargetRef.current = null;
     setDragOverColumnId(null);
     removeDragPreview();
 
@@ -477,6 +501,27 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
   }
 
   const useScrollableColumns = columns.length > 6;
+  const useLargeBoardMode = filteredTasks.length > 200;
+  const groupedTasks = useMemo(() => {
+    const grouped = new Map<string, Task[]>();
+
+    for (const task of filteredTasks) {
+      let groupKey = task.status;
+      if (groupBy === 'project') groupKey = task.project;
+      else if (groupBy === 'priority') groupKey = task.priority;
+      else if (groupBy === 'assignee') groupKey = task.assignee || 'Unassigned';
+
+      const group = grouped.get(groupKey);
+      if (group) group.push(task);
+      else grouped.set(groupKey, [task]);
+    }
+
+    for (const group of grouped.values()) {
+      group.sort((a, b) => a.order - b.order);
+    }
+
+    return grouped;
+  }, [filteredTasks, groupBy]);
 
   const getPriorityColor = (p: string) => {
     switch (p) {
@@ -572,13 +617,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       >
         {columns.map((col) => {
           const isDragOverColumn = dragOverColumnId === col.id && draggedTaskSlug !== null;
-          const groupTasks = filteredTasks.filter(t => {
-            if (groupBy === 'status') return t.status === col.id;
-            if (groupBy === 'project') return t.project === col.id;
-            if (groupBy === 'priority') return t.priority === col.id;
-            if (groupBy === 'assignee') return (t.assignee || 'Unassigned') === col.id;
-            return true;
-          }).sort((a, b) => a.order - b.order);
+          const groupTasks = groupedTasks.get(col.id) || [];
 
           return (
             <div
@@ -589,7 +628,7 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                 // shape. Keeping the frame aligned to its grid cell prevents
                 // badges and cards from overlapping adjacent columns when the
                 // board contains many tasks.
-                transform: isDragOverColumn ? 'scale(1.05)' : 'scale(1)',
+                transform: isDragOverColumn && !useLargeBoardMode ? 'scale(1.05)' : 'scale(1)',
                 transformOrigin: 'center',
                 backgroundColor: isDragOverColumn ? 'rgba(45, 93, 161, 0.08)' : (col.color || 'transparent'),
                 minHeight: '350px',
@@ -599,7 +638,9 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                 padding: '0.6rem',
                 scrollSnapAlign: useScrollableColumns ? 'start' : undefined,
                 boxShadow: isDragOverColumn ? '0 0 0 4px var(--blue), var(--shadow)' : 'none',
-                transition: 'transform 0.18s ease, background-color 0.2s ease, box-shadow 0.18s ease',
+                transition: useLargeBoardMode
+                  ? 'background-color 0.12s ease, box-shadow 0.12s ease'
+                  : 'transform 0.18s ease, background-color 0.2s ease, box-shadow 0.18s ease',
               }}
               onDragOver={(e) => handleDragOverColumn(col.id, e)}
               onDragLeave={(e) => handleDragLeaveColumn(col.id, e)}
@@ -627,12 +668,13 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                       onDragStart={(e) => handleDragStart(task.slug, e)}
                       onDrag={handleDrag}
                       onDragOver={(e) => handleDragOverCard(task.slug, col.id, e)}
-                      onDragLeave={handleDragLeaveCard}
+                      onDragLeave={(e) => handleDragLeaveCard(task.slug, e)}
                       onDrop={(e) => handleDropOnCard(task, e)}
                       onDragEnd={() => {
                         lastDragEndAt.current = Date.now();
                         setDraggedTaskSlug(null);
                         setDragOverTarget(null);
+                        dragOverTargetRef.current = null;
                         setDragOverColumnId(null);
                         removeDragPreview();
                       }}
@@ -648,6 +690,8 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
                         opacity: isBeingDragged ? 0.4 : (task.status === 'done' ? 0.75 : 1),
                         padding: '0.75rem 0.9rem',
                         position: 'relative',
+                        contentVisibility: 'auto',
+                        containIntrinsicSize: '145px',
                         transition: 'transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
                         boxShadow: isBeingDragged 
                           ? 'none' 

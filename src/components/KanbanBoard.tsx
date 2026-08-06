@@ -446,20 +446,24 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
     const colList = activeProject?.columns || DEFAULT_COLUMNS;
     columns = colList.map(c => ({ id: c, label: c.toUpperCase().replace('-', ' ') }));
   } else if (groupBy === 'project') {
-    columns = projects.map(p => ({ id: p.slug, label: p.title, color: p.color }));
+    const visibleProjects = projectFilter ? projects.filter(p => p.slug === projectFilter) : projects;
+    columns = visibleProjects.map(p => ({ id: p.slug, label: p.title, color: p.color }));
   } else if (groupBy === 'priority') {
-    columns = [
-      { id: 'critical', label: '🔥 CRITICAL', color: '#ffcdd2' },
-      { id: 'high', label: '⚡ HIGH', color: '#ffe0b2' },
-      { id: 'medium', label: '📌 MEDIUM', color: '#fff9c4' },
-      { id: 'low', label: '🌱 LOW', color: '#c8e6c9' },
-    ];
+    const visiblePriorities = priorityFilter ? [priorityFilter] : ['critical', 'high', 'medium', 'low'];
+    const priorityDefs: Record<string, { label: string; color: string }> = {
+      critical: { label: '🔥 CRITICAL', color: '#ffcdd2' },
+      high: { label: '⚡ HIGH', color: '#ffe0b2' },
+      medium: { label: '📌 MEDIUM', color: '#fff9c4' },
+      low: { label: '🌱 LOW', color: '#c8e6c9' },
+    };
+    columns = visiblePriorities.map(p => ({ id: p, label: priorityDefs[p]?.label || p, color: priorityDefs[p]?.color }));
   } else if (groupBy === 'assignee') {
-    const assignees = Array.from(new Set(tasks.map(t => t.assignee || 'Unassigned')));
+    let assignees = Array.from(new Set(tasks.map(t => t.assignee || 'Unassigned')));
+    if (assigneeFilter) assignees = assignees.filter(a => a === assigneeFilter);
     columns = assignees.map(a => ({ id: a, label: a || 'Unassigned' }));
   }
 
-  const useScrollableColumns = columns.length > 6;
+  const useScrollableColumns = columns.length > 4;
   const useLargeBoardMode = filteredTasks.length > 200;
   const groupedTasks = useMemo(() => {
     const grouped = new Map<string, Task[]>();
@@ -560,20 +564,35 @@ export default function KanbanBoard({ initialTasks, projects, initialProjectFilt
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: useScrollableColumns
-            ? `repeat(${columns.length}, minmax(280px, 320px))`
-            : `repeat(${columns.length}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${columns.length}, minmax(280px, 340px))`,
+          justifyContent: columns.length <= 3 ? 'start' : 'stretch',
           gap: '1rem',
           width: '100%',
           maxWidth: '100%',
-          overflowX: useScrollableColumns ? 'auto' : 'visible',
+          overflowX: 'auto',
           overflowY: 'visible',
-          padding: useScrollableColumns ? '0.35rem 0.35rem 1rem' : '0 0 0.5rem',
+          padding: '0.35rem 0.35rem 1rem',
           alignItems: 'stretch',
-          scrollSnapType: useScrollableColumns ? 'x proximity' : undefined,
+          scrollSnapType: columns.length > 3 ? 'x proximity' : undefined,
           scrollbarWidth: 'thin',
         }}
       >
+        {columns.length === 0 && (
+          <div
+            class="wobbly-border-sm"
+            style={{
+              gridColumn: '1 / -1',
+              padding: '3rem 1rem',
+              textAlign: 'center',
+              backgroundColor: '#ffffff',
+              color: 'var(--fg)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '1.1rem',
+            }}
+          >
+            No projects or columns match the selected filters.
+          </div>
+        )}
         {columns.map((col) => {
           const isDragOverColumn = dragOverColumnId === col.id && draggedTaskSlug !== null;
           const groupTasks = groupedTasks.get(col.id) || [];

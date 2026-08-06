@@ -4,7 +4,7 @@
 
 ### A local-first workspace for humans and AI agents.
 
-Plan projects, move work across a beautiful Kanban board, and keep every decision in plain Markdown files that your team—and your agents—can read.
+Plan projects, move work across a hand-drawn Kanban board, and keep every decision in plain Markdown files that your team—and your AI agents—can read and edit in lockstep.
 
 [![Stack](https://img.shields.io/badge/stack-Astro%20%2B%20Preact-ff4d4d?style=flat-square)](https://astro.build/)
 [![Data](https://img.shields.io/badge/data-Markdown-2d2d2d?style=flat-square)](https://www.markdownguide.org/)
@@ -12,30 +12,60 @@ Plan projects, move work across a beautiful Kanban board, and keep every decisio
 
 <br />
 
-<img src="./public/orbit-hero.jpg" alt="Orbit workspace board" width="100%" />
+<img src="./public/orbit-hero.jpg" alt="Orbit workspace hero banner" width="100%" />
 
 </div>
 
-## See Orbit in action
+## 🎨 See Orbit in action
 
-Orbit brings project visibility and task execution into one lightweight workspace.
+Orbit brings project management, Kanban workflows, and AI agent collaboration together into one fast, hand-crafted workspace.
+
+### 📊 Workspace Dashboard & Interactive Board
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="./public/dashboard-preview.png" alt="Orbit project management dashboard showing active projects and task progress" />
+      <img src="./public/dashboard.png" alt="Orbit Workspace Dashboard showing active projects, metrics, and progress" />
       <br />
-      <strong>Workspace dashboard</strong><br />
-      <sub>See project health, task counts, progress, and recent work at a glance.</sub>
+      <strong>Workspace Dashboard</strong><br />
+      <sub>Monitor project health, overall task counts, progress bars, and active project cards at a glance.</sub>
     </td>
     <td width="50%" align="center">
-      <img src="./public/project-board-preview.png" alt="Orbit Kanban board showing tasks grouped by todo, in progress, in review, and done" />
+      <img src="./public/board.png" alt="Orbit Kanban Board showing tasks grouped by status, priority, and assignee" />
       <br />
-      <strong>Project Kanban board</strong><br />
-      <sub>Filter, group, prioritize, assign, and move tasks through your workflow.</sub>
+      <strong>Interactive Kanban Board</strong><br />
+      <sub>Drag & drop tasks, filter by project or priority, quick-cycle status badges, and group by status, project, priority, or assignee.</sub>
     </td>
   </tr>
 </table>
+
+### 📋 Task Master List & Project Deep-Dives
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="./public/list.png" alt="Orbit Task Master List view with search, filters, and due dates" />
+      <br />
+      <strong>Task Master List</strong><br />
+      <sub>Scan, search, and manage every task across your entire workspace in a clean, compact table view.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="./public/project.png" alt="Orbit Project View with project details, progress overview, and project board" />
+      <br />
+      <strong>Project Overview & Board</strong><br />
+      <sub>Focus on a single project, track progress metrics, and manage project-specific tasks in isolation.</sub>
+    </td>
+  </tr>
+</table>
+
+### 📦 Seamless Import & Export (Zero Lock-in)
+
+<div align="center">
+  <img src="./public/import.png" alt="Orbit Import and Export data modal" width="80%" />
+  <br />
+  <sub>Export your entire workspace into a standard ZIP archive or import/restore backups with a single click.</sub>
+</div>
+
 
 ## Why Orbit?
 

@@ -2,15 +2,15 @@
 
 <br />
 
-<img src="./public/orbit-hero.jpg" alt="Orbit — A hand-drawn, sketch-style project management workspace where humans and AI agents collaborate on a shared Kanban board, with colorful sticky notes, Markdown files, and task cards orbiting a central planet" width="100%" />
+<img src="./public/orbit-hero.jpg" alt="Orbit — a human-centered workspace where AI agents and their tasks orbit around the person directing the work" width="100%" />
 
 <br />
 
 # 🪐 Orbit
 
-**The project management app that feels like a notebook, not a spreadsheet.**
+**The workspace that keeps you at the center of your AI team.**
 
-A local-first, serverless workspace where humans and AI agents plan together on a hand-drawn Kanban board — powered by plain Markdown files, version-controlled with Git, and beautiful enough to make you *want* to organize your work.
+A local-first home for you and the agents working around you. See what they are doing, guide what happens next, and keep the whole story in plain Markdown files you own.
 
 <br />
 
@@ -21,7 +21,7 @@ A local-first, serverless workspace where humans and AI agents plan together on 
 [![Built with Astro](https://img.shields.io/badge/Astro-ff4d4d?style=flat-square&logo=astro&logoColor=white)](https://astro.build/)
 [![Preact](https://img.shields.io/badge/Preact-673AB8?style=flat-square&logo=preact&logoColor=white)](https://preactjs.com/)
 [![Markdown](https://img.shields.io/badge/Data-Markdown-2d2d2d?style=flat-square&logo=markdown&logoColor=white)](https://www.markdownguide.org/)
-[![Local First](https://img.shields.io/badge/Architecture-Local--First-4CAF50?style=flat-square)](#-the-philosophy)
+[![Local First](https://img.shields.io/badge/Architecture-Local--First-4CAF50?style=flat-square)](#-the-story-behind-orbit)
 [![AI Agents](https://img.shields.io/badge/AI_Agents-Ready-ff9800?style=flat-square)](#-working-with-ai-agents)
 [![Zero Database](https://img.shields.io/badge/Database-None_(just_files)-9c27b0?style=flat-square)](#-the-source-of-truth)
 
@@ -37,27 +37,25 @@ A local-first, serverless workspace where humans and AI agents plan together on 
 
 ## 💭 The Story Behind Orbit
 
-> *"I didn't build Orbit because I needed another project management tool. I built it because I was tired of project management tools."*
+Most project tools were built for a world where work meant coordinating with other people. You created a workspace, invited a team, shared pages, assigned tasks, and held meetings to keep everyone aligned. Tools like Notion made that kind of collaboration far better.
 
-Every day, I open the same polished dashboards. The same clinical interfaces with their pixel-perfect borders and enterprise-grade color schemes. They're efficient. They're powerful. And they make me feel like I'm filing taxes.
+But AI is changing the shape of a team.
 
-I started sketching my tasks in a physical notebook. Wobbly boxes. Arrows that didn't quite connect. Little stars next to things that mattered. And something unexpected happened — **I actually wanted to check my task list.** Not because I had to. Because it felt *mine*.
+One person can now work with several agents at once: one writing code, another researching, another reviewing, and another preparing the next task. The ability to produce work is no longer the only constraint. The harder problem is staying aware of everything happening around you.
 
-That notebook didn't judge me for having 47 half-finished tasks. It didn't send me notifications about overdue items in a cold, system-generated font. It just sat there, warm and imperfect, waiting for my next scratchy checkmark.
+Without a shared view, the work scatters across chat threads, terminals, branches, and half-finished plans. Agents can be busy everywhere while you slowly lose the thread. What is being worked on? Why did an agent make that decision? What is blocked? What needs your judgment now?
 
-But notebooks don't sync. They don't let my AI assistant pick up a task at 2 AM while I sleep. They don't version-control my decisions. They don't scale.
+That is the problem Orbit is trying to solve.
 
-So I asked myself a question that became Orbit:
+The name is a picture of how I believe this relationship should work. **You are at the center.** Your goals, taste, and judgment provide the gravity. Agents move around that center—picking up tasks, making progress, and returning with results. Orbit gives you one place to observe that movement and decide where the work should go next.
 
-> ***What if a project management app could feel like opening your favorite notebook — but with the power of Git, the intelligence of AI agents, and the simplicity of Markdown files you can read with `cat`?***
+This is also why Orbit is local-first by design. A workspace for you and your agents should begin on your machine, close to the work itself. It should not require an account, a hosted service, or a company workspace. Projects, tasks, decisions, and agent logs live in ordinary Markdown files. Both you and your agents can read them, Git can remember them, and no platform gets to hold them hostage.
 
-That's what Orbit is. Every card has a slight wobble. Every border looks hand-drawn. The colors are soft pastels — like sticky notes on a whiteboard, not cells in a database. The fonts are playful, not corporate.
+You can still host Orbit and invite other people when the project grows. The difference is that collaboration is a choice, not the starting requirement. Orbit begins as a private workspace for one person and the agents helping them, then expands only when that person wants it to.
 
-**It's not a bug. It's the entire point.**
+The hand-drawn interface comes from the same belief. As software becomes more autonomous, I want the place where I direct it to feel unmistakably human—more like a notebook on my desk than a control panel built for a corporation.
 
-When your tools feel human, your work feels human. When your task board looks like something you doodled during a meeting, you stop dreading it and start *playing* with it.
-
-Orbit is my sketch notebook — and now it's yours too. I hope it brings you the same quiet joy it brings me every time I drag a wobbly card from "To Do" to "Done" and see that hand-drawn progress bar inch forward.
+Orbit is my attempt to make AI collaboration easier to see, easier to guide, and easier to own. Agents may do more of the work, but the human should never disappear from the center of it.
 
 *— Huy*
 
@@ -120,38 +118,38 @@ Orbit is my sketch notebook — and now it's yours too. I hope it brings you the
   <tr>
     <td width="50%">
 
-### 📓 Local-First, Not Cloud-First
+### 🧑 You Remain in Charge
 
-Your workspace is a folder of `.md` files. No database. No server. No subscription. Open them in VS Code, Vim, or `cat`. They're just text.
+Orbit is organized around your goals and decisions. Agents can carry out the work, but you keep the view of the whole project and decide where it goes next.
 
-### ✏️ Sketch-Style Interface
+### 👁️ Agent Work You Can See
 
-Hand-drawn borders, wobbly cards, pastel sticky-note colors, playful fonts. A UI that makes project management feel like doodling in your notebook.
+See what every agent has claimed, what is moving, what is blocked, and where your attention is needed—without reconstructing the story from separate chat sessions.
 
-### 🤖 AI Agent Native
+### 📓 Personal by Default
 
-Claude, Copilot, Gemini, or your own agents can read tasks, claim work, update status, and log progress — through the CLI, API, or directly editing Markdown files.
+No account, central server, or organization setup. Orbit starts as a private workspace on your machine and can be hosted when you are ready to bring in other people.
 
 </td>
 <td width="50%">
 
-### 🌿 Git-Native Workflow
+### 📝 One Shared Source of Truth
 
-Every task update is a file change. Branch, diff, merge, and review project decisions exactly like code. Full history, forever.
+You and your agents work from the same Markdown files. Tasks, status changes, context, and decisions stay together instead of being trapped inside separate conversations.
 
-### ⚡ Serverless & Instant
+### 🌿 Yours All the Way Down
 
-Built on Astro + Preact. No Docker. No PostgreSQL. `npm run dev` and you're live. Deploy anywhere that runs Node, or just run it locally.
+There is no proprietary database. Open your workspace in any editor, track it with Git, process it with scripts, or move it somewhere else. Your history remains yours.
 
-### 🔓 Zero Lock-in
+### ✏️ Deliberately Human
 
-There is no proprietary format. The Markdown files *are* the database. Move them to another tool, process them with scripts, or read them on your phone.
+The soft colors, imperfect borders, and notebook-like cards are a reminder that the system serves a person—not the other way around.
 
 </td>
   </tr>
 </table>
 
-> **TL;DR** — Orbit is what happens when you combine the warmth of a physical notebook with the power of Git and the intelligence of AI agents. It's project management that doesn't feel like project management.
+> **TL;DR** — Other workspaces begin with a group of people. Orbit begins with you and the agents working around you: local by default, observable in one place, and entirely under your control.
 
 ---
 
@@ -266,7 +264,7 @@ orbit task done mobile-app--add-offline-sync     # 🎉 Ship it
 
 ## 🤖 Working with AI Agents
 
-Orbit was designed from the ground up for human + AI collaboration. An agent can:
+Orbit gives every agent a clear way to work without creating a separate world you have to monitor. An agent can:
 
 1. **Read** project and task Markdown directly from the filesystem
 2. **Claim work** by setting `assignee: agent-name` and `status: in-progress`
@@ -291,7 +289,7 @@ curl -X PATCH https://orbit.nvkhuy.com/api/tasks/orbit--refactor-api \
 
 Agent-specific instructions live in [`AGENTS.md`](AGENTS.md) — including the recommended color palette, frontmatter schema, and protocol for picking up and completing tasks.
 
-> **Why this matters:** Most project tools treat AI as an afterthought. Orbit treats AI agents as first-class teammates. The Markdown-first architecture means any agent that can read and write text files can participate — no special SDK, no API key, no permission dance.
+> **Why this matters:** Agents often work inside isolated conversations, each with only part of the picture. Orbit gives them shared, durable context while giving you a view across all of their work. Any agent that can read and write text files can participate—no special SDK, API key, or permission setup required.
 
 ---
 
@@ -410,7 +408,7 @@ Orbit is released under the [MIT License](LICENSE) — use it, fork it, make it 
 
 <br />
 
-*Built with pencils, pastels, and a deep love for the way notebooks make us feel.*
+*Built to keep humans at the center of the work.*
 
 **[🪐 Try Orbit →](https://orbit.nvkhuy.com)**
 

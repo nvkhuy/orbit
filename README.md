@@ -1,280 +1,419 @@
 <div align="center">
 
-# 🪐 Orbit
+<br />
 
-### A local-first workspace for humans and AI agents.
-
-Plan projects, move work across a hand-drawn Kanban board, and keep every decision in plain Markdown files that your team—and your AI agents—can read and edit in lockstep.
-
-[![Stack](https://img.shields.io/badge/stack-Astro%20%2B%20Preact-ff4d4d?style=flat-square)](https://astro.build/)
-[![Data](https://img.shields.io/badge/data-Markdown-2d2d2d?style=flat-square)](https://www.markdownguide.org/)
-[![License](https://img.shields.io/badge/license-MIT-2d5da1?style=flat-square)](LICENSE)
+<img src="./public/orbit-hero.jpg" alt="Orbit — A hand-drawn, sketch-style project management workspace where humans and AI agents collaborate on a shared Kanban board, with colorful sticky notes, Markdown files, and task cards orbiting a central planet" width="100%" />
 
 <br />
 
-<img src="./public/orbit-hero.jpg" alt="Orbit workspace hero banner" width="100%" />
+# 🪐 Orbit
+
+**The project management app that feels like a notebook, not a spreadsheet.**
+
+A local-first, serverless workspace where humans and AI agents plan together on a hand-drawn Kanban board — powered by plain Markdown files, version-controlled with Git, and beautiful enough to make you *want* to organize your work.
+
+<br />
+
+[![Live Demo](https://img.shields.io/badge/✦_Live_Demo-orbit.nvkhuy.com-ff6b6b?style=for-the-badge)](https://orbit.nvkhuy.com)
+[![Stars](https://img.shields.io/github/stars/nvkhuy/orbit?style=for-the-badge&logo=github&color=ffd54f&logoColor=2d2d2d)](https://github.com/nvkhuy/orbit/stargazers)
+[![License](https://img.shields.io/badge/License-MIT-2d5da1?style=for-the-badge)](LICENSE)
+
+[![Built with Astro](https://img.shields.io/badge/Astro-ff4d4d?style=flat-square&logo=astro&logoColor=white)](https://astro.build/)
+[![Preact](https://img.shields.io/badge/Preact-673AB8?style=flat-square&logo=preact&logoColor=white)](https://preactjs.com/)
+[![Markdown](https://img.shields.io/badge/Data-Markdown-2d2d2d?style=flat-square&logo=markdown&logoColor=white)](https://www.markdownguide.org/)
+[![Local First](https://img.shields.io/badge/Architecture-Local--First-4CAF50?style=flat-square)](#-the-philosophy)
+[![AI Agents](https://img.shields.io/badge/AI_Agents-Ready-ff9800?style=flat-square)](#-working-with-ai-agents)
+[![Zero Database](https://img.shields.io/badge/Database-None_(just_files)-9c27b0?style=flat-square)](#-the-source-of-truth)
+
+<br />
+
+**[Live Demo](https://orbit.nvkhuy.com)** · **[Quick Start](#-quick-start)** · **[Why Orbit?](#-why-orbit)** · **[Screenshots](#-see-orbit-in-action)** · **[CLI](#-cli)** · **[For AI Agents](#-working-with-ai-agents)** · **[Contributing](#-contributing)**
+
+<br />
 
 </div>
 
-## 🎨 See Orbit in action
+---
 
-Orbit brings project management, Kanban workflows, and AI agent collaboration together into one fast, hand-crafted workspace.
+## 💭 The Story Behind Orbit
 
-### 📊 Workspace Dashboard & Interactive Board
+> *"I didn't build Orbit because I needed another project management tool. I built it because I was tired of project management tools."*
 
-<table>
-  <tr>
-    <td width="50%" align="center">
-      <img src="./public/dashboard.png" alt="Orbit Workspace Dashboard showing active projects, metrics, and progress" />
-      <br />
-      <strong>Workspace Dashboard</strong><br />
-      <sub>Monitor project health, overall task counts, progress bars, and active project cards at a glance.</sub>
-    </td>
-    <td width="50%" align="center">
-      <img src="./public/board.png" alt="Orbit Kanban Board showing tasks grouped by status, priority, and assignee" />
-      <br />
-      <strong>Interactive Kanban Board</strong><br />
-      <sub>Drag & drop tasks, filter by project or priority, quick-cycle status badges, and group by status, project, priority, or assignee.</sub>
-    </td>
-  </tr>
-</table>
+Every day, I open the same polished dashboards. The same clinical interfaces with their pixel-perfect borders and enterprise-grade color schemes. They're efficient. They're powerful. And they make me feel like I'm filing taxes.
 
-### 📋 Task Master List & Project Deep-Dives
+I started sketching my tasks in a physical notebook. Wobbly boxes. Arrows that didn't quite connect. Little stars next to things that mattered. And something unexpected happened — **I actually wanted to check my task list.** Not because I had to. Because it felt *mine*.
 
-<table>
-  <tr>
-    <td width="50%" align="center">
-      <img src="./public/list.png" alt="Orbit Task Master List view with search, filters, and due dates" />
-      <br />
-      <strong>Task Master List</strong><br />
-      <sub>Scan, search, and manage every task across your entire workspace in a clean, compact table view.</sub>
-    </td>
-    <td width="50%" align="center">
-      <img src="./public/project.png" alt="Orbit Project View with project details, progress overview, and project board" />
-      <br />
-      <strong>Project Overview & Board</strong><br />
-      <sub>Focus on a single project, track progress metrics, and manage project-specific tasks in isolation.</sub>
-    </td>
-  </tr>
-</table>
+That notebook didn't judge me for having 47 half-finished tasks. It didn't send me notifications about overdue items in a cold, system-generated font. It just sat there, warm and imperfect, waiting for my next scratchy checkmark.
 
-### 📦 Seamless Import & Export (Zero Lock-in)
+But notebooks don't sync. They don't let my AI assistant pick up a task at 2 AM while I sleep. They don't version-control my decisions. They don't scale.
+
+So I asked myself a question that became Orbit:
+
+> ***What if a project management app could feel like opening your favorite notebook — but with the power of Git, the intelligence of AI agents, and the simplicity of Markdown files you can read with `cat`?***
+
+That's what Orbit is. Every card has a slight wobble. Every border looks hand-drawn. The colors are soft pastels — like sticky notes on a whiteboard, not cells in a database. The fonts are playful, not corporate.
+
+**It's not a bug. It's the entire point.**
+
+When your tools feel human, your work feels human. When your task board looks like something you doodled during a meeting, you stop dreading it and start *playing* with it.
+
+Orbit is my sketch notebook — and now it's yours too. I hope it brings you the same quiet joy it brings me every time I drag a wobbly card from "To Do" to "Done" and see that hand-drawn progress bar inch forward.
+
+*— Huy*
+
+---
+
+## ✨ See Orbit in Action
+
+### 📊 Workspace Dashboard
 
 <div align="center">
-  <img src="./public/import.png" alt="Orbit Import and Export data modal" width="80%" />
-  <br />
-  <sub>Export your entire workspace into a standard ZIP archive or import/restore backups with a single click.</sub>
+<img src="./public/dashboard.png" alt="Orbit workspace dashboard showing hand-drawn project cards with pastel backgrounds, progress bars, task metrics, and a sketch-style UI with wobbly borders" width="100%" />
+<br />
+<sub><strong>Your command center.</strong> Monitor every project's health at a glance — task counts, progress bars, and pastel-colored project cards that feel like sticky notes on your desk.</sub>
 </div>
 
+<br />
 
-## Why Orbit?
+### 📋 Kanban Board
 
-Most project tools put your work behind a database, a subscription, and a permission system that does not understand your development workflow. Orbit takes a different approach:
+<div align="center">
+<img src="./public/board.png" alt="Orbit Kanban board with drag-and-drop task cards organized in TODO, IN PROGRESS, IN REVIEW, and DONE columns with sketch-style hand-drawn borders" width="100%" />
+<br />
+<sub><strong>Drag, drop, done.</strong> A full interactive Kanban board with filters, search, grouping by status/project/priority/assignee — all in that signature hand-drawn style.</sub>
+</div>
 
-- **Local-first** — your workspace is a directory of Markdown files.
-- **Human-friendly** — use the dashboard, board, list view, and task editors.
-- **Agent-ready** — agents can inspect and update the same files through the CLI or filesystem.
-- **Git-native** — review, diff, branch, and merge project work like code.
-- **Delightful by default** — a hand-drawn interface that makes planning feel lightweight.
+<br />
 
-There is no proprietary database to export and no workspace lock-in. The Markdown files are the source of truth.
+### 📝 Task List & Project Views
 
-## What you can do
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="./public/list.png" alt="Orbit task list view with search, filters, sortable columns and sketch-style design" />
+      <br />
+      <strong>Task Master List</strong><br />
+      <sub>Every task across your workspace in one compact, searchable, filterable table.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="./public/project.png" alt="Orbit single project view with progress overview, task board, and project details in hand-drawn style" />
+      <br />
+      <strong>Project Deep-Dive</strong><br />
+      <sub>Focus on a single project — track progress, manage tasks, and see the big picture.</sub>
+    </td>
+  </tr>
+</table>
 
-| Area | Capabilities |
-| --- | --- |
-| Workspace | Dashboard metrics, active project progress, and recent tasks |
-| Board | Drag tasks between statuses, reorder cards, filter, search, and group by status, project, priority, or assignee |
-| List | Scan and filter every task in a compact table |
-| Projects | Create projects, set status/priority/color, and track progress |
-| Tasks | Edit title, status, project, priority, assignee, due date, tags, and Markdown notes |
-| Agents | Keep agent identities and workspace context alongside the work |
-| CLI | Create, query, update, complete, and summarize workspace data from a terminal |
+### 📦 Import & Export — Zero Lock-in
 
-## Quick start
+<div align="center">
+<img src="./public/import.png" alt="Orbit workspace import and export modal for backing up Markdown data as ZIP" width="75%" />
+<br />
+<sub><strong>Your data is yours.</strong> Export everything as a ZIP of Markdown files. Import it back anytime. No vendor lock-in. Ever.</sub>
+</div>
 
-### Requirements
+---
 
-- Node.js **22.12.0 or newer**
-- npm
+## 🚀 Why Orbit?
 
-### Install and run
+<table>
+  <tr>
+    <td width="50%">
+
+### 📓 Local-First, Not Cloud-First
+
+Your workspace is a folder of `.md` files. No database. No server. No subscription. Open them in VS Code, Vim, or `cat`. They're just text.
+
+### ✏️ Sketch-Style Interface
+
+Hand-drawn borders, wobbly cards, pastel sticky-note colors, playful fonts. A UI that makes project management feel like doodling in your notebook.
+
+### 🤖 AI Agent Native
+
+Claude, Copilot, Gemini, or your own agents can read tasks, claim work, update status, and log progress — through the CLI, API, or directly editing Markdown files.
+
+</td>
+<td width="50%">
+
+### 🌿 Git-Native Workflow
+
+Every task update is a file change. Branch, diff, merge, and review project decisions exactly like code. Full history, forever.
+
+### ⚡ Serverless & Instant
+
+Built on Astro + Preact. No Docker. No PostgreSQL. `npm run dev` and you're live. Deploy anywhere that runs Node, or just run it locally.
+
+### 🔓 Zero Lock-in
+
+There is no proprietary format. The Markdown files *are* the database. Move them to another tool, process them with scripts, or read them on your phone.
+
+</td>
+  </tr>
+</table>
+
+> **TL;DR** — Orbit is what happens when you combine the warmth of a physical notebook with the power of Git and the intelligence of AI agents. It's project management that doesn't feel like project management.
+
+---
+
+## 🏁 Quick Start
+
+### Prerequisites
+
+- **Node.js** 22.12.0 or newer
+- **npm**
+
+### 3 commands to joy
 
 ```bash
 git clone https://github.com/nvkhuy/orbit.git
 cd orbit
-npm install
-npm run dev
+npm install && npm run dev
 ```
 
-Open [http://localhost:4321](http://localhost:4321).
+Open **[http://localhost:4321](http://localhost:4321)** and feel the sketch.
 
-The same workflow is available through Make:
+### Using Make
 
 ```bash
-make run       # Start the development server
-make test      # Reset and seed a rich demo workspace
-make reset     # Remove Markdown content from projects, tasks, and agents
+make run       # Start the dev server
+make test      # Seed a rich demo workspace (30 projects, 600+ tasks)
+make reset     # Clear all workspace data (⚠️ destructive)
 ```
 
-> **Warning:** `make reset` is destructive. It deletes `.md` files from `src/content/projects`, `src/content/tasks`, and `src/content/agents`. Commit or back up your workspace first.
+> [!WARNING]
+> `make reset` deletes all `.md` files from `src/content/projects`, `src/content/tasks`, and `src/content/agents`. Back up or commit first.
 
-## The source of truth
+---
 
-Orbit stores workspace data in three directories:
+## 📐 What You Can Do
 
-```text
+| Area | What's Inside |
+| :--- | :--- |
+| **Dashboard** | Project health cards, task metrics, progress bars, recent activity |
+| **Board** | Drag-and-drop Kanban with grouping by status, project, priority, or assignee |
+| **List** | Searchable, filterable table of every task across all projects |
+| **Projects** | Create projects with status, priority, color, tags, and progress tracking |
+| **Tasks** | Full editing — title, status, priority, assignee, due date, tags, Markdown notes |
+| **Agents** | Agent profiles living alongside your work — context for AI collaborators |
+| **Import/Export** | ZIP-based backup and restore — your data leaves when you leave |
+| **CLI** | Create, query, update, and summarize workspace data from your terminal |
+
+---
+
+## 🗂️ The Source of Truth
+
+All data lives as Markdown with YAML frontmatter:
+
+```
 src/content/
-├── agents/
-│   └── <agent-name>.md
-├── projects/
-│   └── <project-slug>.md
-└── tasks/
-    └── <project-slug>--<task-slug>.md
+├── agents/          # 🤖 AI agent profiles
+│   └── <name>.md
+├── projects/        # 📁 Project definitions
+│   └── <slug>.md
+└── tasks/           # ✅ Individual tasks
+    └── <project>--<task>.md
 ```
 
-A task is ordinary Markdown with structured frontmatter:
+### A task looks like this:
 
 ```yaml
 ---
-title: Improve API error messages
-project: orbit-platform
-status: in-progress
-priority: high
-assignee: claude
-tags: [backend, quality]
+title: "Add dark mode support"
+project: "design-system"
+status: "in-progress"       # todo | in-progress | in-review | done
+priority: "high"            # low | medium | high | critical
+assignee: "claude"
+tags: [frontend, ui, accessibility]
 due: 2026-08-15
 order: 200
-parent: ""
 created: 2026-08-05
 updated: 2026-08-05
-blocked_by: []
 ---
 
 ## Notes
 
-Document the expected error shape and client behavior.
+Implement CSS custom properties for theme switching.
+Respect user's system preference with `prefers-color-scheme`.
 ```
 
-Supported task statuses are `todo`, `in-progress`, `in-review`, and `done`. Priorities are `low`, `medium`, `high`, and `critical`.
+That's it. No ORM. No migrations. No schema files. **Just Markdown.**
 
-## CLI
+---
 
-Use the local CLI directly with Node:
+## 💻 CLI
+
+Manage your workspace without opening a browser:
 
 ```bash
-node cli/index.js summary
-node cli/index.js query "keyboard"
-node cli/index.js project list
-node cli/index.js task list --project orbit-platform --status todo
+# Overview
+orbit summary                                    # Workspace health report
+orbit query "authentication"                     # Search across all content
+
+# Projects
+orbit project list                               # List all projects
+orbit project create --title "Mobile App" --status active --priority high
+
+# Tasks
+orbit task list --project design-system --status todo
+orbit task create --project mobile-app --title "Add offline sync" --priority high --assignee claude
+orbit task update mobile-app--add-offline-sync --status in-progress
+orbit task done mobile-app--add-offline-sync     # 🎉 Ship it
 ```
 
-Create and update work without opening the browser:
+> **Pro tip:** Pipe `orbit summary` into your AI agent's context for an instant workspace briefing.
+
+---
+
+## 🤖 Working with AI Agents
+
+Orbit was designed from the ground up for human + AI collaboration. An agent can:
+
+1. **Read** project and task Markdown directly from the filesystem
+2. **Claim work** by setting `assignee: agent-name` and `status: in-progress`
+3. **Log progress** under `## Agent Log` inside the task file
+4. **Complete work** by changing status to `done`
+5. **Commit changes** alongside code — because task files *are* just files
+
+### API Endpoints
 
 ```bash
-node cli/index.js project create \
-  --title "Mobile App" \
-  --status active \
-  --priority high
+# Create a task
+curl -X POST https://orbit.nvkhuy.com/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Refactor API", "project": "orbit", "priority": "high", "assignee": "claude"}'
 
-node cli/index.js task create \
-  --project mobile-app \
-  --title "Add offline sync" \
-  --priority high \
-  --status todo \
-  --assignee claude
-
-node cli/index.js task update mobile-app--add-offline-sync \
-  --status in-progress \
-  --assignee huy
-
-node cli/index.js task done mobile-app--add-offline-sync
+# Update a task
+curl -X PATCH https://orbit.nvkhuy.com/api/tasks/orbit--refactor-api \
+  -d '{"status": "in-progress"}'
 ```
 
-The `summary` command reports project progress and open tasks in a format that is easy to paste into an agent session or pipe into another tool.
+### Agent Guidelines
 
-## Architecture
+Agent-specific instructions live in [`AGENTS.md`](AGENTS.md) — including the recommended color palette, frontmatter schema, and protocol for picking up and completing tasks.
 
-```text
-                 Markdown workspace
-                src/content/**/*.md
-                         │
-          ┌──────────────┴──────────────┐
-          │                             │
-     Orbit web app                  Orbit CLI
-   Astro + Preact                 Node + Commander
-          │                             │
-          └──────────────┬──────────────┘
-                         │
-                   Git / agents /
-                    human editors
+> **Why this matters:** Most project tools treat AI as an afterthought. Orbit treats AI agents as first-class teammates. The Markdown-first architecture means any agent that can read and write text files can participate — no special SDK, no API key, no permission dance.
+
+---
+
+## 🏗️ Architecture
+
+```
+                    ┌─────────────────────────────┐
+                    │    src/content/**/*.md       │
+                    │    (Markdown = Database)     │
+                    └──────────────┬──────────────┘
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │                    │                     │
+    ┌─────────▼─────────┐  ┌──────▼──────┐  ┌──────────▼──────────┐
+    │   🌐 Web App      │  │  ⌨️  CLI    │  │  🤖 AI Agents       │
+    │   Astro + Preact   │  │  Commander  │  │  File I/O or API    │
+    │   Islands Arch.    │  │  Node.js    │  │  Any LLM            │
+    └─────────┬─────────┘  └──────┬──────┘  └──────────┬──────────┘
+              │                    │                     │
+              └────────────────────┼────────────────────┘
+                                   │
+                    ┌──────────────▼──────────────┐
+                    │      🌿 Git + Filesystem    │
+                    │      Version Control        │
+                    │      Single Source of Truth  │
+                    └─────────────────────────────┘
 ```
 
-- **Astro** provides the application shell, server rendering, and API routes.
-- **Preact** powers interactive islands such as the Kanban board and editors.
-- **gray-matter** parses and writes Markdown frontmatter.
-- **Commander** exposes the terminal workflow.
-- **Node filesystem APIs** keep persistence transparent and local.
+| Layer | Technology | Role |
+| :--- | :--- | :--- |
+| **Framework** | [Astro](https://astro.build/) | Server rendering, file-based routing, API routes |
+| **Islands** | [Preact](https://preactjs.com/) | Interactive components (board, editors, modals) |
+| **Parser** | [gray-matter](https://github.com/jonschlinkert/gray-matter) | Read/write YAML frontmatter in Markdown |
+| **CLI** | [Commander](https://github.com/tj/commander.js) | Terminal interface for all workspace operations |
+| **Storage** | Node.js `fs` | Direct filesystem — no database layer |
 
-The browser uses API routes for mutations, while the resulting Markdown files remain directly editable and versionable.
+---
 
-## Development commands
-
-| Command | Purpose |
-| --- | --- |
-| `npm install` | Install dependencies |
-| `npm run dev` | Start the local development server |
-| `npm run build` | Create a production build in `dist/` |
-| `npm run preview` | Preview the production build locally |
-| `make test` | Seed 30 varied projects with 15–30 tasks each across every status and priority |
-| `make reset` | Remove all workspace Markdown content |
-| `make update-skills` | Sync agent skills and guidelines across `claude`, `codex`, and `gemini` directories |
-
-Before opening a pull request, run:
+## 🛠️ Development
 
 ```bash
-npm run build
+npm install          # Install dependencies
+npm run dev          # Start local dev server at localhost:4321
+npm run build        # Production build → dist/
+npm run preview      # Preview production build locally
 ```
 
-## Project layout
-
-```text
-.
-├── cli/                 # Terminal commands for projects, tasks, and queries
-├── public/              # Static assets and favicon
-├── scripts/             # Workspace reset and test-fixture tooling
-├── src/components/      # Astro and Preact UI components
-├── src/content/         # Projects, tasks, and agents—the data layer
-├── src/pages/            # Dashboard, board, list, editors, and API routes
-├── src/styles/           # Global sketch design system and animations
-├── Makefile              # Common local workflows
-└── plan.md              # Product and implementation notes
+```bash
+make test            # Seed 30 projects × ~20 tasks each (demo data)
+make reset           # ⚠️ Wipe all workspace content
+make update-skills   # Sync agent guidelines across claude/codex/gemini
 ```
 
-## Working with agents
+### Project Structure
 
-Orbit is designed for shared human/agent workspaces. An agent can:
+```
+orbit/
+├── cli/                  # Terminal commands (project, task, query, summary)
+├── public/               # Static assets, screenshots, favicon
+├── scripts/              # Workspace seeding and reset tooling
+├── src/
+│   ├── components/       # Astro + Preact UI components
+│   ├── content/          # 📂 Projects, tasks, agents (the data)
+│   ├── pages/            # Routes: dashboard, board, list, editors, API
+│   └── styles/           # Global sketch design system & animations
+├── AGENTS.md             # AI agent collaboration guidelines
+├── Makefile              # Common workflows
+└── package.json
+```
 
-1. Read project and task Markdown directly.
-2. Claim work by setting `assignee` and `status: in-progress`.
-3. Add progress notes under an `## Agent Log` section.
-4. Mark the task `done` when the work is complete.
-5. Commit the Markdown changes alongside code changes.
+---
 
-Because the data is plain text, every update is inspectable in Git and portable across tools.
+## 🤝 Contributing
 
-## Contributing
+Orbit is open source and contributions are warmly welcome!
 
-Issues and pull requests are welcome. A good contribution usually follows this loop:
+### How to contribute
 
-1. Create a focused branch.
-2. Make the smallest coherent change.
-3. Run `npm run build`.
-4. Add or update fixture coverage with `make test` when the change affects workspace flows.
-5. Open a pull request with the motivation, behavior change, and verification steps.
+1. **Fork & clone** the repo
+2. **Create a branch** for your change
+3. **Make the smallest coherent change** — Orbit values simplicity
+4. **Run `npm run build`** to verify everything compiles
+5. **Open a PR** with motivation, behavior change, and testing steps
 
-Please keep the local-first model intact: new features should preserve direct Markdown access and remain usable from both the UI and automation workflows where practical.
+### Guidelines
 
-## License
+- **Preserve the sketch aesthetic** — new components should feel hand-drawn
+- **Keep it local-first** — features must work with plain Markdown files
+- **No database dependencies** — the filesystem is the only storage layer
+- **Both UI and CLI** — new features should be accessible from both where practical
 
-Orbit is released under the [MIT License](LICENSE).
+> [!TIP]
+> Use `make test` to seed a rich workspace with 30 diverse projects and 600+ tasks — perfect for testing your changes at scale.
+
+---
+
+## 💛 Star History
+
+If Orbit makes your day a little brighter, a ⭐ means the world.
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=nvkhuy/orbit&type=Date)](https://star-history.com/#nvkhuy/orbit&Date)
+
+</div>
+
+---
+
+## 📄 License
+
+Orbit is released under the [MIT License](LICENSE) — use it, fork it, make it yours.
+
+---
+
+<div align="center">
+
+<br />
+
+*Built with pencils, pastels, and a deep love for the way notebooks make us feel.*
+
+**[🪐 Try Orbit →](https://orbit.nvkhuy.com)**
+
+<br />
+
+</div>

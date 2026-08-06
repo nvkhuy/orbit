@@ -1,6 +1,8 @@
 import { useState } from 'preact/hooks';
 import type { Task, Project } from './KanbanBoard';
 import SketchSelect from './SketchSelect';
+import SketchDatePicker from './SketchDatePicker';
+import { SketchTrashIcon } from './SketchIcons';
 
 interface TaskListViewProps {
   initialTasks: Task[];
@@ -490,11 +492,9 @@ export default function TaskListView({ initialTasks, projects }: TaskListViewPro
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold' }}>Due Date</label>
-                  <input
-                    type="date"
+                  <SketchDatePicker
                     value={activeTask.due || ''}
-                    onChange={(e: any) => setActiveTask({ ...activeTask, due: e.target.value })}
-                    class="sketch-input"
+                    onChange={(val) => setActiveTask({ ...activeTask, due: val })}
                   />
                 </div>
               </div>
@@ -569,8 +569,9 @@ export default function TaskListView({ initialTasks, projects }: TaskListViewPro
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', marginBottom: '0.75rem', color: 'var(--fg)' }}>
-              🗑️ Delete Task?
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', marginBottom: '0.75rem', color: 'var(--fg)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <SketchTrashIcon size={24} color="#ff8a80" />
+              <span>Delete Task?</span>
             </h3>
             <p style={{ fontSize: '1.05rem', marginBottom: '1.5rem', color: '#444' }}>
               Are you sure you want to delete <strong>"{taskToDelete.title}"</strong>?

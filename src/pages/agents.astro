@@ -2,6 +2,7 @@
 import BaseLayout from '../components/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import Badge from '../components/Badge.astro';
+import { SketchRobotIcon, SketchHumanIcon } from '../components/SketchIcons';
 import { readAgentsFromDisk } from '../lib/content';
 
 const agents = readAgentsFromDisk();
@@ -10,7 +11,10 @@ const agents = readAgentsFromDisk();
 <BaseLayout title="Orbit - Agent Hub">
   <div style="display: flex; flex-direction: column; gap: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h1 style="font-size: 3rem; transform: rotate(-1deg);">🤖 Agent Hub</h1>
+      <h1 style="font-size: 3rem; transform: rotate(-1deg); display: flex; align-items: center; gap: 0.6rem;">
+        <SketchRobotIcon size={44} />
+        <span>Agent Hub</span>
+      </h1>
     </div>
     
     <p style="font-size: 1.25rem;">
@@ -23,7 +27,19 @@ const agents = readAgentsFromDisk();
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
             <h2 style="font-size: 2rem;">{agent.data.name}</h2>
             <Badge color={agent.data.type === 'ai' ? '#bbdefb' : '#c8e6c9'}>
-              {agent.data.type === 'ai' ? '🤖 AI Agent' : '🧑 Human'}
+              <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                {agent.data.type === 'ai' ? (
+                  <>
+                    <SketchRobotIcon size={18} />
+                    <span>AI Agent</span>
+                  </>
+                ) : (
+                  <>
+                    <SketchHumanIcon size={18} />
+                    <span>Human</span>
+                  </>
+                )}
+              </span>
             </Badge>
           </div>
 

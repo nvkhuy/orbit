@@ -3,7 +3,7 @@ import BaseLayout from '../components/BaseLayout.astro';
 import Badge from '../components/Badge.astro';
 import ProjectGrid from '../components/ProjectGrid';
 import OrbitLogo from '../components/OrbitLogo.astro';
-import { SketchFolderIcon, SketchPinIcon } from '../components/SketchIcons';
+import { SketchFolderIcon, SketchPinIcon, SketchClipboardIcon, SketchWorkspaceIcon } from '../components/SketchIcons';
 import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const rawProjects = readProjectsFromDisk();
@@ -55,8 +55,8 @@ const dashboardProjects = projects.map(project => {
     {/* Hero Section */}
     <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 0.75rem;">
       <div>
-        <h1 style="font-size: 1.6rem; transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 0.4rem;">
-          <OrbitLogo size={34} />
+        <h1 style="font-size: 1.6rem; transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 0.45rem;">
+          <SketchWorkspaceIcon size={36} />
           <span>Workspace</span>
         </h1>
         <p style="font-size: 1.05rem; color: var(--fg); opacity: 0.85;">
@@ -65,7 +65,10 @@ const dashboardProjects = projects.map(project => {
       </div>
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <a href="/new?type=task" class="sketch-button" style="font-size: 0.95rem; padding: 0.35rem 1rem;">+ New Task</a>
-        <a href="/board" class="sketch-button secondary" style="font-size: 0.95rem; padding: 0.35rem 1rem;">📋 View Board</a>
+        <a href="/board" class="sketch-button secondary" style="font-size: 0.95rem; padding: 0.35rem 1rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <SketchClipboardIcon size={20} />
+          <span>View Board</span>
+        </a>
       </div>
     </div>
 

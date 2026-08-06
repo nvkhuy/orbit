@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import KanbanBoard from '../components/KanbanBoard';
+import { SketchClipboardIcon } from '../components/SketchIcons';
 import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const projectFilter = Astro.url.searchParams.get('project') || '';
@@ -32,7 +33,10 @@ const tasks = rawTasks.map(t => ({
 <BaseLayout title="Orbit - Kanban Board">
   <div style="display: flex; flex-direction: column; gap: 1rem;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h1 style="font-size: 2rem; transform: rotate(-1deg);">📋 Workspace Board</h1>
+      <h1 style="font-size: 2rem; transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 0.5rem;">
+        <SketchClipboardIcon size={34} />
+        <span>Workspace Board</span>
+      </h1>
     </div>
 
     <KanbanBoard 

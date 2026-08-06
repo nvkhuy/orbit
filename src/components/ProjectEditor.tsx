@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import type { Project } from './KanbanBoard';
 import SketchSelect from './SketchSelect';
+import { SketchTrashIcon } from './SketchIcons';
 
 interface ProjectEditorProps {
   initialProject: Project & { status: string; body: string };
@@ -46,8 +47,9 @@ export default function ProjectEditor({ initialProject, onProjectChange, onReque
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <div class="sketch-card postit" data-decoration="tape">
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '1rem' }}>
-          <button onClick={onRequestDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)' }}>
-            🗑️ Delete Project
+          <button onClick={onRequestDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+            <SketchTrashIcon size={18} color="#ff8a80" />
+            <span>Delete Project</span>
           </button>
         </div>
 

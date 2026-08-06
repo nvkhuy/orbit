@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import QuickCreate from '../components/QuickCreate';
+import { SketchSparklesIcon } from '../components/SketchIcons';
 import { readProjectsFromDisk } from '../lib/content';
 
 const rawProjects = readProjectsFromDisk();
@@ -14,7 +15,10 @@ const initialMode = Astro.url.searchParams.get('type') === 'project' ? 'project'
 
 <BaseLayout title="Orbit - Quick Create">
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-    <h1 style="font-size: 3rem; text-align: center; transform: rotate(-1deg);">✨ Quick Create</h1>
+    <h1 style="font-size: 3rem; text-align: center; transform: rotate(-1deg); display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+      <SketchSparklesIcon size={42} />
+      <span>Quick Create</span>
+    </h1>
     <QuickCreate client:load projects={projects} initialMode={initialMode} />
   </div>
 </BaseLayout>

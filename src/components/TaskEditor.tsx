@@ -1,6 +1,8 @@
 import { useState } from 'preact/hooks';
 import type { Task, Project } from './KanbanBoard';
 import SketchSelect from './SketchSelect';
+import SketchDatePicker from './SketchDatePicker';
+import { SketchTrashIcon } from './SketchIcons';
 
 interface TaskEditorProps {
   initialTask: Task & { id: string; body: string };
@@ -68,8 +70,9 @@ export default function TaskEditor({ initialTask, projects }: TaskEditorProps) {
           <a href="/board" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--fg)' }}>
             ← Back to Board
           </a>
-          <button onClick={handleDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)' }}>
-            🗑️ Delete Task
+          <button onClick={handleDelete} class="sketch-button secondary" style={{ padding: '0.2rem 0.8rem', fontSize: '1rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+            <SketchTrashIcon size={18} color="#ff8a80" />
+            <span>Delete Task</span>
           </button>
         </div>
 
@@ -138,12 +141,9 @@ export default function TaskEditor({ initialTask, projects }: TaskEditorProps) {
 
           <div>
             <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold' }}>Due Date</label>
-            <input
-              type="date"
+            <SketchDatePicker
               value={task.due || ''}
-              onChange={(e: any) => updateTask({ due: e.target.value })}
-              class="sketch-input"
-              style={{ padding: '0.3rem 0.6rem', fontSize: '1rem' }}
+              onChange={(val) => updateTask({ due: val })}
             />
           </div>
         </div>

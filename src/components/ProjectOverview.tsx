@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import ProjectEditor from './ProjectEditor';
+import { SketchGearIcon, SketchTrashIcon } from './SketchIcons';
 
 interface ProgressTask {
   project: string;
@@ -100,8 +101,9 @@ export default function ProjectOverview({
       >
         <div class="project-overview__topline">
           <a href="/" class="project-overview__back">← Dashboard</a>
-          <button class="sketch-button" onClick={openDetails}>
-            ⚙️ Project Details
+          <button class="sketch-button" onClick={openDetails} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <SketchGearIcon size={20} />
+            <span>Project Details</span>
           </button>
         </div>
 
@@ -190,8 +192,9 @@ export default function ProjectOverview({
             }}
             onClick={(event) => event.stopPropagation()}
           >
-            <h3 id="delete-project-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', marginBottom: '0.75rem', color: 'var(--fg)' }}>
-              🗑️ Delete Project?
+            <h3 id="delete-project-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', marginBottom: '0.75rem', color: 'var(--fg)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <SketchTrashIcon size={24} color="#ff8a80" />
+              <span>Delete Project?</span>
             </h3>
             <p style={{ fontSize: '1.05rem', marginBottom: deleteError ? '0.75rem' : '1.5rem', color: '#444' }}>
               Are you sure you want to delete <strong>"{project.title}"</strong>?

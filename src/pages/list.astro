@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
 import TaskListView from '../components/TaskListView';
+import { SketchListIcon } from '../components/SketchIcons';
 import { readProjectsFromDisk, readTasksFromDisk } from '../lib/content';
 
 const rawProjects = readProjectsFromDisk();
@@ -29,7 +30,10 @@ const tasks = rawTasks.map(t => ({
 
 <BaseLayout title="Orbit - Task List View">
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-    <h1 style="font-size: 3rem; transform: rotate(1deg);">📄 Task Master List</h1>
+    <h1 style="font-size: 3rem; transform: rotate(1deg); display: flex; align-items: center; gap: 0.6rem;">
+      <SketchListIcon size={44} />
+      <span>Task Master List</span>
+    </h1>
     <TaskListView client:load initialTasks={tasks} projects={projects} />
   </div>
 </BaseLayout>

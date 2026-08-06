@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import type { Project } from './KanbanBoard';
 import SketchSelect from './SketchSelect';
+import { SketchPencilIcon, SketchFolderIcon, SketchPinIcon, SketchRocketIcon } from './SketchIcons';
 
 interface QuickCreateProps {
   projects: Project[];
@@ -155,16 +156,18 @@ export default function QuickCreate({ projects, initialMode = 'task' }: QuickCre
         <button
           class={`sketch-button ${mode === 'task' ? '' : 'secondary'}`}
           onClick={() => setMode('task')}
-          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem' }}
+          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem', gap: '0.5rem' }}
         >
-          ✏️ Create Task
+          <SketchPencilIcon size={22} />
+          <span>Create Task</span>
         </button>
         <button
           class={`sketch-button ${mode === 'project' ? '' : 'secondary'}`}
           onClick={() => setMode('project')}
-          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem' }}
+          style={{ fontSize: '1.1rem', padding: '0.4rem 1.25rem', gap: '0.5rem' }}
         >
-          📁 Create Project
+          <SketchFolderIcon size={22} />
+          <span>Create Project</span>
         </button>
       </div>
 
@@ -251,8 +254,15 @@ export default function QuickCreate({ projects, initialMode = 'task' }: QuickCre
             />
           </div>
 
-          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem' }}>
-            {loading ? 'Creating...' : '💾 Pin Task to Board'}
+          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            {loading ? (
+              'Creating...'
+            ) : (
+              <>
+                <SketchPinIcon size={22} color="var(--accent)" />
+                <span>Pin Task to Board</span>
+              </>
+            )}
           </button>
         </form>
       ) : (
@@ -319,8 +329,15 @@ export default function QuickCreate({ projects, initialMode = 'task' }: QuickCre
             />
           </div>
 
-          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem' }}>
-            {loading ? 'Creating...' : '📁 Launch Project'}
+          <button type="submit" disabled={loading} class="sketch-button" style={{ width: '100%', marginTop: '0.25rem', fontSize: '1.15rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            {loading ? (
+              'Creating...'
+            ) : (
+              <>
+                <SketchFolderIcon size={22} color="#ffd54f" />
+                <span>Launch Project</span>
+              </>
+            )}
           </button>
         </form>
       )}

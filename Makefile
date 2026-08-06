@@ -1,4 +1,4 @@
-.PHONY: run reset test build serve docker-build docker-run docker-stop
+.PHONY: run reset test build serve docker-build docker-run docker-stop update-skills skills
 
 run:
 	npm run dev
@@ -23,3 +23,8 @@ reset:
 
 test:
 	node scripts/workspace.mjs test
+
+update-skills:
+	node scripts/update-skills.mjs
+
+skills: update-skills

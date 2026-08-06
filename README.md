@@ -228,6 +228,7 @@ The browser uses API routes for mutations, while the resulting Markdown files re
 | `npm run preview` | Preview the production build locally |
 | `make test` | Seed 30 varied projects with 15–30 tasks each across every status and priority |
 | `make reset` | Remove all workspace Markdown content |
+| `make update-skills` | Sync agent skills and guidelines across `claude`, `codex`, and `gemini` directories |
 
 Before opening a pull request, run:
 
